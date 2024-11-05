@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -25,21 +26,23 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-        http.csrf(csrfConfig -> csrfConfig.disable());
+        http.csrf(csrfConfig -> csrfConfig.disable())
+                .cors(Customizer.withDefaults())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> {
+                    auth
+                            .requestMatchers(
+                                    "/user/signup",
+                                    "/user/login",
+                                    "/user/check_email",
+                                    "/user/check_nickname",
+                                    "/user/refresh"
+                            )
+                            .permitAll()
+                            .anyRequest().authenticated();
 
-        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-
-        http.authorizeHttpRequests(auth -> {
-            auth
-                    .requestMatchers(
-                            "/user/signup",
-                            "/user/login",
-                            "/user/check_email",
-                            "/user/check_nickname").permitAll()
-                    .anyRequest().authenticated();
-
-        }).addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-
+                })
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 }
