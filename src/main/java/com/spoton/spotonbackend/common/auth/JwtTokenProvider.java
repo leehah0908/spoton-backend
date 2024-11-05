@@ -15,13 +15,19 @@ import java.util.Date;
 @Slf4j
 public class JwtTokenProvider {
 
-    @Value("${jwt.secretKey}")
-    private String secretKey;
+    @Value("${jwt.acc.secretKey}")
+    private String accSecretKey;
 
-    @Value("${jwt.expiration}")
-    private int expiration;
+    @Value("${jwt.acc.expiration}")
+    private int accExpiration;
 
-    public String createToken(String email, String auth) {
+    @Value("${jwt.rf.secretKey}")
+    private String rfSecretKey;
+
+    @Value("${jwt.rf.expiration}")
+    private int rfExpiration;
+
+    public String createAccessToken(String email, String auth) {
 
         Claims claims = Jwts.claims().setSubject(email);
 
@@ -31,15 +37,30 @@ public class JwtTokenProvider {
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(now)
-                .setExpiration(new Date(now.getTime() + expiration * 60 * 100L * 100L)) // 30분
-                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .setExpiration(new Date(now.getTime() + accExpiration * 60 * 1000L))
+                .signWith(SignatureAlgorithm.HS256, accSecretKey)
+                .compact();
+    }
+
+    public String createRefreshToken(String email, String auth) {
+
+        Claims claims = Jwts.claims().setSubject(email);
+
+        claims.put("auth", auth);
+        Date now = new Date();
+
+        return Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(now)
+                .setExpiration(new Date(now.getTime() + rfExpiration * 60 * 1000L))
+                .signWith(SignatureAlgorithm.HS256, rfSecretKey)
                 .compact();
     }
 
     public TokenUserInfo validateAndGetTokenUserInfo(String token) throws Exception {
 
         Claims claims = Jwts.parserBuilder()
-                .setSigningKey(secretKey)
+                .setSigningKey(accSecretKey)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();

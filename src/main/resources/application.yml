@@ -10,11 +10,23 @@ spring:
     database: mysql
     database-platform: org.hibernate.dialect.MySQL8Dialect
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 5MB
 
 server:
   port: 8181
 
 jwt:
-  expiration: 30
-  secretKey: ${JWT_KEY}
+  acc:
+    expiration: 30
+    secretKey: ${ACC_KEY}
+  rf:
+    expiration: 14400
+    secretKey: ${RF_KEY}
