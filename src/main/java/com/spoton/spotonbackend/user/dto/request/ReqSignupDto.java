@@ -27,8 +27,6 @@ public class ReqSignupDto {
     @Size(min = 2, message = "닉네임은 최소 2자 이상")
     private String nickname;
 
-    private MultipartFile profile;
-
     private MyTeam myTeam;
 
     public User toUser(PasswordEncoder passwordEncoder) {
