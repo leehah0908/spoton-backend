@@ -4,6 +4,8 @@ import com.spoton.spotonbackend.user.dto.response.UserResDto;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Objects;
+
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
@@ -24,6 +26,7 @@ public class User {
     private String password;
 
     @Column(unique = true, nullable = false)
+    @Setter
     private String nickname;
 
     @Column(unique = true)
@@ -38,12 +41,17 @@ public class User {
     @Builder.Default
     private Auth auth = Auth.USER;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private MyTeam myTeam;
 
     public void setMyTeam(MyTeam myTeam) {
+        // myTeam이 null일 경우, 모든 필드가 null인 빈 MyTeam 객체 생성
+        if (myTeam == null) {
+            myTeam = new MyTeam();
+        }
+
         this.myTeam = myTeam;
-        myTeam.setUser(this); // 양방향 관계 설정
+        myTeam.setUser(this); // 항상 양방향 연관 관계 설정
     }
 
     public UserResDto toUserResDto() {
