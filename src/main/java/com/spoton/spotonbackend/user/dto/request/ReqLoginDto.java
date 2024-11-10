@@ -21,5 +21,4 @@ public class ReqLoginDto {
 
     private String token;
 
-
 }

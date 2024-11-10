@@ -3,6 +3,7 @@ package com.spoton.spotonbackend.user.controller;
 import com.spoton.spotonbackend.common.auth.EmailProvider;
 import com.spoton.spotonbackend.common.auth.TokenUserInfo;
 import com.spoton.spotonbackend.common.dto.CommonErrorDto;
+import com.spoton.spotonbackend.user.dto.request.ReqPasswordChangeDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,8 +69,6 @@ public class UserController {
         CommonResDto resDto = new CommonResDto(HttpStatus.OK, "로그인 성공", resMap);
         return new ResponseEntity<>(resDto, HttpStatus.OK);
     }
-
-    // 회원 탈퇴
 
     // 이메일 중복 확인
     @GetMapping("/check_email")
@@ -137,9 +136,9 @@ public class UserController {
     public ResponseEntity<?> checkPw(@RequestBody String password,
                                      @AuthenticationPrincipal TokenUserInfo userInfo){
 
-        boolean checkPassword = userService.checkPassword(userInfo, password);
+        User user = userService.checkPassword(userInfo.getEmail(), password);
 
-        CommonResDto resDto = new CommonResDto(HttpStatus.OK, "비밀번호가 일치합니다.", checkPassword);
+        CommonResDto resDto = new CommonResDto(HttpStatus.OK, "비밀번호가 일치합니다.", user.getUserId());
         return new ResponseEntity<>(resDto, HttpStatus.OK);
     }
 
@@ -178,9 +177,37 @@ public class UserController {
         return new ResponseEntity<>(resDto, HttpStatus.OK);
     }
 
-    // 비밀번호 변경 -> 확인 요청이랑 같이할지 분리할지 정하기
+    // 비밀번호 재발급
+    @PostMapping("/pw_send")
+    public ResponseEntity<?> sendPassword(@RequestParam String email){
+        System.out.println(email);
 
-    // 비밀번호 찾기 -> 재발급(UUID로)
+        String newPw = emailProvider.sendTemporaryPassword(email);
+
+        if (newPw.equals("fail")) {
+            CommonErrorDto errorDto = new CommonErrorDto(HttpStatus.SERVICE_UNAVAILABLE, "임시 비밀번호 전송 실패");
+            return new ResponseEntity<>(errorDto, HttpStatus.SERVICE_UNAVAILABLE);
+        }
+
+        User user = userService.setNewPassword(email, newPw);
+
+        CommonResDto resDto = new CommonResDto(HttpStatus.OK, "임시 비밀번호 전송 성공", user.getUserId());
+
+        return new ResponseEntity<>(resDto, HttpStatus.OK);
+    }
+
+    // 비밀번호 변경 -> 확인 요청이랑 같이할지 분리할지 정하기
+    @PostMapping("/change_pw")
+    public ResponseEntity<?> changePassword(@RequestBody ReqPasswordChangeDto dto) {
+
+        User user = userService.checkPassword(dto.getEmail(), dto.getOldPassword());
+
+        User newUser = userService.setNewPassword(user.getEmail(), dto.getNewPassword());
+
+        CommonResDto resDto = new CommonResDto(HttpStatus.OK, "비밀번호 변경이 완료되었습니다.", newUser.getUserId());
+
+        return new ResponseEntity<>(resDto, HttpStatus.OK);
+    }
 
     // 프로필 사진 설정
     @PostMapping("/set_profile")

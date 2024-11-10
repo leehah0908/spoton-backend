@@ -1,6 +1,7 @@
 package com.spoton.spotonbackend.user.service;
 
 import com.spoton.spotonbackend.common.auth.TokenUserInfo;
+import com.spoton.spotonbackend.common.dto.CommonErrorDto;
 import com.spoton.spotonbackend.user.dto.request.ReqLoginDto;
 import com.spoton.spotonbackend.user.dto.request.ReqSignupDto;
 import com.spoton.spotonbackend.user.dto.response.UserResDto;
@@ -13,6 +14,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -78,15 +80,16 @@ public class UserService {
         return true;
     }
 
-    public boolean checkPassword(TokenUserInfo userInfo, String password) {
+    public User checkPassword(String email, String password) {
 
-        User loginUser = userRepository.findByEmail(userInfo.getEmail()).orElseThrow(() ->
+        User loginUser = userRepository.findByEmail(email).orElseThrow(() ->
                 new EntityNotFoundException("회원 정보 찾을 수 없음"));
 
         if (!passwordEncoder.matches(password, loginUser.getPassword())) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
-        return true;
+
+        return loginUser;
     }
 
     public UserResDto myInfo() {
@@ -153,6 +156,16 @@ public class UserService {
         );
 
         user.setProfile(imagePath);
+
+        return user;
+    }
+
+    public User setNewPassword(String email, String newPw) {
+        User user = userRepository.findByEmail(email).orElseThrow(
+                () -> new EntityNotFoundException("회원 정보를 찾을 수 없습니다.")
+        );
+
+        user.setPassword(passwordEncoder.encode(newPw));
 
         return user;
     }
