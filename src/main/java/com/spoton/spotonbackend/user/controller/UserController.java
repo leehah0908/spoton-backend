@@ -165,11 +165,12 @@ public class UserController {
         return new ResponseEntity<>(resDto, HttpStatus.OK);
     }
 
-    // 비밀번호 변경 -> 확인 요청이랑 같이할지 분리할지 정하기
+    // 비밀번호 변경
     @PostMapping("/change_pw")
-    public ResponseEntity<?> changePassword(@RequestBody ReqPasswordChangeDto dto) {
+    public ResponseEntity<?> changePassword(@RequestBody ReqPasswordChangeDto dto,
+                                            @AuthenticationPrincipal TokenUserInfo userInfo) {
 
-        User user = userService.checkPassword(dto.getEmail(), dto.getOldPassword());
+        User user = userService.checkPassword(userInfo.getEmail(), dto.getOldPassword());
 
         User newUser = userService.setNewPassword(user.getEmail(), dto.getNewPassword());
 
@@ -263,6 +264,4 @@ public class UserController {
 
         return new ResponseEntity<>(resDto, HttpStatus.OK);
     }
-
-
 }

@@ -39,6 +39,7 @@ public class EmailProvider {
 
     private String getCertificationMessage(int certificationNumber) {
         String certificationMessage = "";
+
         certificationMessage += "<div>\n" +
                 "인증코드를 확인해주세요." +
                 "<br>\n" +
@@ -60,7 +61,7 @@ public class EmailProvider {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
 
-            String htmlContent = getTemporaryPassword(getTemporaryPassword(temporaryPassword));
+            String htmlContent = getTemporaryPassword(temporaryPassword);
 
             mimeMessageHelper.setTo(email);
             mimeMessageHelper.setSubject(subject);
@@ -77,12 +78,13 @@ public class EmailProvider {
 
     private String getTemporaryPassword(String temporaryPassword) {
         String temporaryPasswordMessage = "";
+
         temporaryPasswordMessage += "<div>\n" +
                 "임시 비밀번호입니다." +
                 "<br>\n" +
                 "<strong style=\"font-size: 30px;\">" + temporaryPassword + "</strong>" +
                 "<br>\n" +
-                "해당 임시 비밀번호를 임시 비밀번호란에 기입해 주세요." +
+                "임시 비밀번호로 로그인을 한 후 비밀번호 변경을 해주세요." +
                 "</div>";
 
         return temporaryPasswordMessage;
