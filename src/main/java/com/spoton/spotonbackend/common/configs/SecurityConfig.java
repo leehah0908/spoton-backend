@@ -34,6 +34,7 @@ public class SecurityConfig {
                             .requestMatchers(
                                     "/user/signup",
                                     "/user/login",
+                                    "/user/email_send",
                                     "/user/check_email",
                                     "/user/check_nickname",
                                     "/user/refresh"

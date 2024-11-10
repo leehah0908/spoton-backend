@@ -1,5 +1,6 @@
 package com.spoton.spotonbackend.user.controller;
 
+import com.spoton.spotonbackend.common.auth.EmailProvider;
 import com.spoton.spotonbackend.common.auth.TokenUserInfo;
 import com.spoton.spotonbackend.common.dto.CommonErrorDto;
 import jakarta.validation.Valid;
@@ -35,6 +36,7 @@ public class UserController {
     private final JwtTokenProvider jwtTokenProvider;
     @Qualifier("refresh-template")
     private final RedisTemplate<String, Object> redisTemplate;
+    private final EmailProvider emailProvider;
 
     // 회원가입
     @PostMapping("/signup")
@@ -66,6 +68,7 @@ public class UserController {
     }
 
     // 로그아웃 -> 프론트에서 결정??
+    // 회원 탈퇴
 
     // 이메일 중복 확인
     @GetMapping("/check_email")
@@ -74,6 +77,20 @@ public class UserController {
         boolean checkEmail = userService.checkEmail(email);
 
         CommonResDto resDto = new CommonResDto(HttpStatus.OK, "사용가능한 이메일입니다.", checkEmail);
+        return new ResponseEntity<>(resDto, HttpStatus.OK);
+    }
+
+    // 이메일 인증
+    @PostMapping("/email_send")
+    public ResponseEntity<?> sendEmail(@RequestParam String email){
+
+        if (!emailProvider.sendCertificationMail(email)) {
+            CommonErrorDto errorDto = new CommonErrorDto(HttpStatus.SERVICE_UNAVAILABLE, "인증 이메일 전송 실패");
+            return new ResponseEntity<>(errorDto, HttpStatus.SERVICE_UNAVAILABLE);
+        }
+
+        CommonResDto resDto = new CommonResDto(HttpStatus.OK, "인증 이메일 전송 성공", true);
+
         return new ResponseEntity<>(resDto, HttpStatus.OK);
     }
 
@@ -133,7 +150,6 @@ public class UserController {
         return new ResponseEntity<>(resDto, HttpStatus.OK);
     }
 
-
     // 비밀번호 변경 -> 확인 요청이랑 같이할지 분리할지 정하기
 
     // 비밀번호 찾기 -> 재발급(UUID로)
@@ -172,4 +188,6 @@ public class UserController {
 
         return new ResponseEntity<>(resDto, HttpStatus.OK);
     }
+
+
 }
