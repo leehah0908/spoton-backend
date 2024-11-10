@@ -35,6 +35,7 @@ public class SecurityConfig {
                                     "/user/signup",
                                     "/user/login",
                                     "/user/email_send",
+                                    "/user/email_certi",
                                     "/user/check_email",
                                     "/user/check_nickname",
                                     "/user/refresh"

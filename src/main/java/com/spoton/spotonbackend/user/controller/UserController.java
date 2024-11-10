@@ -5,6 +5,7 @@ import com.spoton.spotonbackend.common.auth.TokenUserInfo;
 import com.spoton.spotonbackend.common.dto.CommonErrorDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -34,9 +35,10 @@ public class UserController {
 
     private final UserService userService;
     private final JwtTokenProvider jwtTokenProvider;
-    @Qualifier("refresh-template")
-    private final RedisTemplate<String, Object> redisTemplate;
     private final EmailProvider emailProvider;
+
+    private final RedisTemplate<String, Object> redisTemplate;
+    private final RedisTemplate<String, Integer> emailCertificationTemplate;
 
     // 회원가입
     @PostMapping("/signup")
@@ -67,7 +69,6 @@ public class UserController {
         return new ResponseEntity<>(resDto, HttpStatus.OK);
     }
 
-    // 로그아웃 -> 프론트에서 결정??
     // 회원 탈퇴
 
     // 이메일 중복 확인
@@ -80,17 +81,44 @@ public class UserController {
         return new ResponseEntity<>(resDto, HttpStatus.OK);
     }
 
-    // 이메일 인증
+    // 이메일 인증 메일 보내기
     @PostMapping("/email_send")
     public ResponseEntity<?> sendEmail(@RequestParam String email){
 
-        if (!emailProvider.sendCertificationMail(email)) {
+        int number = emailProvider.sendCertificationMail(email);
+        if (number == 500) {
             CommonErrorDto errorDto = new CommonErrorDto(HttpStatus.SERVICE_UNAVAILABLE, "인증 이메일 전송 실패");
             return new ResponseEntity<>(errorDto, HttpStatus.SERVICE_UNAVAILABLE);
         }
 
+        // 레디스에 인증번호 3분동안 저장
+        emailCertificationTemplate.opsForValue().set(email, number, 3, TimeUnit.MINUTES);
+
         CommonResDto resDto = new CommonResDto(HttpStatus.OK, "인증 이메일 전송 성공", true);
 
+        return new ResponseEntity<>(resDto, HttpStatus.OK);
+    }
+
+    // 이메일 인증 확인
+    @GetMapping("/email_certi")
+    public ResponseEntity<?> emailCertification(@RequestParam String email,
+                                                @RequestParam Integer reqNumber) {
+
+        Integer tokenNumber = emailCertificationTemplate.opsForValue().get(email);
+
+        if (tokenNumber == null) {
+            return new ResponseEntity<>(
+                    new CommonErrorDto(HttpStatus.REQUEST_TIMEOUT, "인증 번호를 재전송 한 후 다시시도 해주세요."),
+                    HttpStatus.REQUEST_TIMEOUT);
+        }
+
+        if (!tokenNumber.equals(reqNumber)){
+            return new ResponseEntity<>(
+                    new CommonErrorDto(HttpStatus.UNAUTHORIZED, "인증번호가 일치하지 않습니다."),
+                    HttpStatus.UNAUTHORIZED);
+        }
+
+        CommonResDto resDto = new CommonResDto(HttpStatus.OK, "인증이 완료되었습니다.", true);
         return new ResponseEntity<>(resDto, HttpStatus.OK);
     }
 

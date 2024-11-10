@@ -12,15 +12,17 @@ public class EmailProvider {
 
     private final JavaMailSender mailSender;
 
-    public boolean sendCertificationMail(String email) {
+    public Integer sendCertificationMail(String email) {
+
+        String subject = "[SpotOn] 이메일 인증 메일입니다.";
+        int number = makeRandomNumber();
 
         try {
-            String subject = "[SpotOn] 이메일 인증 메일입니다.";
 
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
 
-            String htmlContent = getCertificationMessage(makeRandomNumber());
+            String htmlContent = getCertificationMessage(number);
 
             mimeMessageHelper.setTo(email);
             mimeMessageHelper.setSubject(subject);
@@ -30,9 +32,9 @@ public class EmailProvider {
 
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            return 500;
         }
-        return true;
+        return number;
     }
 
     private String getCertificationMessage(int certificationNumber) {
