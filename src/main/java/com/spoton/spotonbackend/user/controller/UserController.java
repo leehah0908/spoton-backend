@@ -6,8 +6,6 @@ import com.spoton.spotonbackend.common.dto.CommonErrorDto;
 import com.spoton.spotonbackend.user.dto.request.ReqPasswordChangeDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
@@ -38,8 +36,10 @@ public class UserController {
     private final JwtTokenProvider jwtTokenProvider;
     private final EmailProvider emailProvider;
 
+    // 레디스 관련 주입
     private final RedisTemplate<String, Object> redisTemplate;
     private final RedisTemplate<String, Integer> emailCertificationTemplate;
+
 
     // 회원가입
     @PostMapping("/signup")
@@ -50,6 +50,7 @@ public class UserController {
         CommonResDto resDto = new CommonResDto(HttpStatus.CREATED, "회원가입 완료", user.getUserId());
         return new ResponseEntity<>(resDto, HttpStatus.CREATED);
     }
+
 
     // 로그인
     @PostMapping("/login")
@@ -70,16 +71,6 @@ public class UserController {
         return new ResponseEntity<>(resDto, HttpStatus.OK);
     }
 
-    // 회원 탈퇴
-    @PostMapping("/withdraw")
-    public ResponseEntity<?> withdraw(@AuthenticationPrincipal TokenUserInfo userInfo){
-
-        userService.withdraw(userInfo);
-
-        CommonResDto resDto = new CommonResDto(HttpStatus.OK, "회원탈퇴가 완료되었습니다.", true);
-
-        return new ResponseEntity<>(resDto, HttpStatus.OK);
-    }
 
     // 이메일 중복 확인
     @GetMapping("/check_email")
@@ -132,6 +123,7 @@ public class UserController {
         return new ResponseEntity<>(resDto, HttpStatus.OK);
     }
 
+
     // 닉네임 중복 확인
     @GetMapping("/check_nickname")
     public ResponseEntity<?> checkNickname(@RequestParam String nickname){
@@ -142,6 +134,7 @@ public class UserController {
         return new ResponseEntity<>(resDto, HttpStatus.OK);
     }
 
+
     // 비밀번호 확인
     @PostMapping("/check_pw")
     public ResponseEntity<?> checkPw(@RequestBody String password,
@@ -150,41 +143,6 @@ public class UserController {
         User user = userService.checkPassword(userInfo.getEmail(), password);
 
         CommonResDto resDto = new CommonResDto(HttpStatus.OK, "비밀번호가 일치합니다.", user.getUserId());
-        return new ResponseEntity<>(resDto, HttpStatus.OK);
-    }
-
-    // 회원 정보 조회 (관리자)
-    @GetMapping("/user_info")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> userInfo(Pageable pageable) {
-
-        List<UserResDto> ResDto = userService.userInfo(pageable);
-
-        CommonResDto resDto = new CommonResDto(HttpStatus.OK, "회원정보 조회 성공", ResDto);
-
-        return new ResponseEntity<>(resDto, HttpStatus.OK);
-    }
-
-    // 회원 정보 조화 (회원)
-    @GetMapping("/my_info")
-    public ResponseEntity<?> myInfo() {
-
-        UserResDto dto = userService.myInfo();
-
-        CommonResDto resDto = new CommonResDto(HttpStatus.OK, "myinfo 조회 성공", dto);
-
-        return new ResponseEntity<>(resDto, HttpStatus.OK);
-    }
-
-    // 정보 수정 (닉네임, 마이팀)
-    @PatchMapping("/modify")
-    public ResponseEntity<?> modify(@RequestBody ReqSignupDto dto,
-                                    @AuthenticationPrincipal TokenUserInfo userInfo) {
-
-        User user = userService.modify(userInfo, dto);
-
-        CommonResDto resDto = new CommonResDto(HttpStatus.OK, "회원 정보 수정 성공", user.getUserId());
-
         return new ResponseEntity<>(resDto, HttpStatus.OK);
     }
 
@@ -220,6 +178,44 @@ public class UserController {
         return new ResponseEntity<>(resDto, HttpStatus.OK);
     }
 
+
+    // 회원 정보 조회 (관리자)
+    @GetMapping("/user_info")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> userInfo(Pageable pageable) {
+
+        List<UserResDto> ResDto = userService.userInfo(pageable);
+
+        CommonResDto resDto = new CommonResDto(HttpStatus.OK, "회원정보 조회 성공", ResDto);
+
+        return new ResponseEntity<>(resDto, HttpStatus.OK);
+    }
+
+    // 회원 정보 조회 (회원)
+    @GetMapping("/my_info")
+    public ResponseEntity<?> myInfo() {
+
+        UserResDto dto = userService.myInfo();
+
+        CommonResDto resDto = new CommonResDto(HttpStatus.OK, "myinfo 조회 성공", dto);
+
+        return new ResponseEntity<>(resDto, HttpStatus.OK);
+    }
+
+
+    // 정보 수정 (닉네임, 마이팀)
+    @PatchMapping("/modify")
+    public ResponseEntity<?> modify(@RequestBody ReqSignupDto dto,
+                                    @AuthenticationPrincipal TokenUserInfo userInfo) {
+
+        User user = userService.modify(userInfo, dto);
+
+        CommonResDto resDto = new CommonResDto(HttpStatus.OK, "회원 정보 수정 성공", user.getUserId());
+
+        return new ResponseEntity<>(resDto, HttpStatus.OK);
+    }
+
+
     // 프로필 사진 설정
     @PostMapping("/set_profile")
     public ResponseEntity<?> setProfile(@RequestBody MultipartFile imgFile,
@@ -231,6 +227,7 @@ public class UserController {
 
         return new ResponseEntity<>(resDto, HttpStatus.OK);
     }
+
 
     // 토큰 재요청시 refresh token 확인 후 발급
     @PostMapping("/refresh")
@@ -251,6 +248,18 @@ public class UserController {
         map.put("token", newAccessToken);
 
         CommonResDto resDto = new CommonResDto(HttpStatus.OK, "토큰 재발급 성공", map);
+
+        return new ResponseEntity<>(resDto, HttpStatus.OK);
+    }
+
+
+    // 회원 탈퇴
+    @PostMapping("/withdraw")
+    public ResponseEntity<?> withdraw(@AuthenticationPrincipal TokenUserInfo userInfo){
+
+        userService.withdraw(userInfo);
+
+        CommonResDto resDto = new CommonResDto(HttpStatus.OK, "회원탈퇴가 완료되었습니다.", true);
 
         return new ResponseEntity<>(resDto, HttpStatus.OK);
     }
