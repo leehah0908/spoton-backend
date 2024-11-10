@@ -70,6 +70,17 @@ public class UserController {
         return new ResponseEntity<>(resDto, HttpStatus.OK);
     }
 
+    // 회원 탈퇴
+    @PostMapping("/withdraw")
+    public ResponseEntity<?> withdraw(@AuthenticationPrincipal TokenUserInfo userInfo){
+
+        userService.withdraw(userInfo);
+
+        CommonResDto resDto = new CommonResDto(HttpStatus.OK, "회원탈퇴가 완료되었습니다.", true);
+
+        return new ResponseEntity<>(resDto, HttpStatus.OK);
+    }
+
     // 이메일 중복 확인
     @GetMapping("/check_email")
     public ResponseEntity<?> checkEmail(@RequestParam String email){
