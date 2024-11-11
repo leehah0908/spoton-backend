@@ -1,13 +1,12 @@
 package com.spoton.spotonbackend.user.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.spoton.spotonbackend.common.dto.CommonErrorDto;
+import com.spoton.spotonbackend.common.entity.CustomOAuth2User;
 import com.spoton.spotonbackend.user.dto.request.ReqSocialLoginDto;
 import com.spoton.spotonbackend.user.entity.MyTeam;
 import com.spoton.spotonbackend.user.entity.User;
 import com.spoton.spotonbackend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import org.hibernate.query.NativeQuery;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -20,7 +19,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class Oauth2UserService extends DefaultOAuth2UserService {
+public class OAuth2UserService extends DefaultOAuth2UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -30,34 +29,51 @@ public class Oauth2UserService extends DefaultOAuth2UserService {
 
         OAuth2User oAuth2User = super.loadUser(userRequest);
         String clientName = userRequest.getClientRegistration().getClientName();
+        String email = null;
 
         if (clientName.equals("kakao")) {
             Map<String, String> properties = (Map<String, String>) oAuth2User.getAttributes().get("properties");
             Map<String, String> kakaoAccount = (Map<String, String>) oAuth2User.getAttributes().get("kakao_account");
 
-            boolean isExist = userRepository.findByEmail(kakaoAccount.get("email")).isPresent();
+            email = kakaoAccount.get("email");
+            boolean isExist = userRepository.findByEmail(email).isPresent();
 
             if (!isExist) {
-                System.out.println("회원가입");
-                ReqSocialLoginDto newDto = ReqSocialLoginDto.builder()
-                        .nickname(properties.get("nickname"))
-                        .profile(properties.get("profile_image"))
-                        .email(kakaoAccount.get("email"))
-                        .build();
-
-                User user = newDto.toUser(passwordEncoder);
-                user.setPassword(UUID.randomUUID().toString());
-                user.setSnsLinked(true);
-                user.setMyTeam(new MyTeam());
-
-                userRepository.save(user);
+                socialSignup(properties.get("nickname"),
+                        properties.get("profile_image"),
+                        kakaoAccount.get("email"));
             }
-            System.out.println("회원가입 안함");
+
         } else if (clientName.equals("naver")) {
+            Map<String, String> resultMap = (Map<String, String>) oAuth2User.getAttributes().get("response");
+            System.out.println(resultMap);
 
+            email = resultMap.get("email");
+            boolean isExist = userRepository.findByEmail(email).isPresent();
+
+            if (!isExist) {
+                socialSignup(resultMap.get("nickname"),
+                        resultMap.get("profile_image"),
+                        resultMap.get("email"));
+            }
         }
+        return new CustomOAuth2User(email);
+    }
 
+    // 소셜 로그인 회원가입
+    public void socialSignup(String nickname, String profile, String email) {
+        ReqSocialLoginDto newDto = ReqSocialLoginDto.builder()
+                .nickname(nickname)
+                .profile(profile)
+                .email(email)
+                .build();
 
-        return oAuth2User;
+        User user = newDto.toUser(passwordEncoder);
+        user.setPassword(UUID.randomUUID().toString());
+        user.setSnsLinked(true);
+        user.setMyTeam(new MyTeam());
+
+        userRepository.save(user);
     }
 }
+

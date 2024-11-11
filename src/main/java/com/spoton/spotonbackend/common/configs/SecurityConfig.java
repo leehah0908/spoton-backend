@@ -1,6 +1,7 @@
 package com.spoton.spotonbackend.common.configs;
 
 import com.spoton.spotonbackend.common.auth.JwtAuthFilter;
+import com.spoton.spotonbackend.common.auth.OAuth2SuccessHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -24,6 +25,7 @@ public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
     private final DefaultOAuth2UserService defaultOAuth2UserService;
+    private final OAuth2SuccessHandler oAuth2SuccessHandler;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -49,9 +51,10 @@ public class SecurityConfig {
 
                 })
                 .oauth2Login(oauth2 -> oauth2
-                        .authorizationEndpoint(endpoint ->endpoint.baseUri("/social_login"))
+                        .authorizationEndpoint(endpoint -> endpoint.baseUri("/social_login"))
                         .redirectionEndpoint(endpoint -> endpoint.baseUri("/oauth2/callback/*"))
-                        .userInfoEndpoint(endpoint->endpoint.userService(defaultOAuth2UserService)))
+                        .userInfoEndpoint(endpoint -> endpoint.userService(defaultOAuth2UserService))
+                        .successHandler(oAuth2SuccessHandler))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
