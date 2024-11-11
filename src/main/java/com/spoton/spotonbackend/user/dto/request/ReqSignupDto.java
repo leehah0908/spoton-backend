@@ -4,7 +4,6 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.multipart.MultipartFile;
 import com.spoton.spotonbackend.user.entity.MyTeam;
 import com.spoton.spotonbackend.user.entity.User;
 

@@ -1,20 +1,17 @@
 package com.spoton.spotonbackend.user.service;
 
 import com.spoton.spotonbackend.common.auth.TokenUserInfo;
-import com.spoton.spotonbackend.common.dto.CommonErrorDto;
 import com.spoton.spotonbackend.user.dto.request.ReqLoginDto;
 import com.spoton.spotonbackend.user.dto.request.ReqSignupDto;
 import com.spoton.spotonbackend.user.dto.response.UserResDto;
 import com.spoton.spotonbackend.user.entity.MyTeam;
 import com.spoton.spotonbackend.user.entity.User;
-import com.spoton.spotonbackend.user.repository.MyTeamRepository;
 import com.spoton.spotonbackend.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -33,8 +30,6 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final MyTeamRepository myTeamRepository;
-
     private final PasswordEncoder passwordEncoder;
 
     public User signup(@Valid ReqSignupDto dto) {

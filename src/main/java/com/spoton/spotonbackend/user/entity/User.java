@@ -36,6 +36,7 @@ public class User {
 
     @Column(nullable = false)
     @Builder.Default
+    @Setter
     private boolean snsLinked = false;
 
     @Enumerated(EnumType.STRING)

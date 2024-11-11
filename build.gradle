@@ -48,6 +48,9 @@ dependencies {
 
     // 이메일 인증을 위한 설정
     implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+    // oauth 설정
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 }
 
 tasks.named('test') {
