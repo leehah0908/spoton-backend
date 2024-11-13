@@ -60,6 +60,7 @@ public class UserController {
     public ResponseEntity<?> login(@Valid @RequestBody ReqLoginDto dto,
                                    HttpServletResponse response){
 
+        // 회원 정보 일치 여부 확인
         User user = userService.login(dto);
 
         // 토큰 발급

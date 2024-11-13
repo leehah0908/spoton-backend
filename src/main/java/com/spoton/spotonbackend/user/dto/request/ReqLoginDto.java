@@ -17,8 +17,6 @@ public class ReqLoginDto {
     @NotEmpty(message = "비밀번호는 필수값입니다.")
     private String password;
 
-    private boolean autoLogin;
-
-    private String token;
+//    private String token;
 
 }

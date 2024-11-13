@@ -49,6 +49,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    // 로그인
     public User login(@Valid ReqLoginDto dto) {
 
         User loginUser = userRepository.findByEmail(dto.getEmail()).orElseThrow(() ->
@@ -60,6 +61,7 @@ public class UserService {
         return loginUser;
     }
 
+    // 이메일 중복 체크
     public boolean checkEmail(String email) {
 
         if (userRepository.findByEmail(email).isPresent()) {
@@ -68,6 +70,7 @@ public class UserService {
         return true;
     }
 
+    // 닉네임 중복 체크
     public boolean checkNickname(String nickname) {
 
         if (userRepository.findByNickname(nickname).isPresent()) {
@@ -76,6 +79,7 @@ public class UserService {
         return true;
     }
 
+    // 비밀번호 일치 확인
     public User checkPassword(String email, String password) {
 
         User loginUser = userRepository.findByEmail(email).orElseThrow(() ->
@@ -88,6 +92,7 @@ public class UserService {
         return loginUser;
     }
 
+    // 마이페이지용 회원 개인 정보 조회
     public UserResDto myInfo() {
         TokenUserInfo userInfo =
                 (TokenUserInfo) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -99,6 +104,7 @@ public class UserService {
         return user.toUserResDto();
     }
 
+    // 회원관리용 회원 정보 리스트 조회
     public List<UserResDto> userInfo(Pageable pageable) {
 
         Page<User> userList = userRepository.findAll(pageable);
@@ -108,6 +114,7 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
+    // 회원 정보 수정
     public User modify(TokenUserInfo userInfo, ReqSignupDto dto) {
 
         User user = userRepository.findByEmail(userInfo.getEmail()).orElseThrow(
@@ -129,12 +136,14 @@ public class UserService {
         return user;
     }
 
+    // id로 유저 정보 찾기 (access 토큰 재발급시 필요)
     public User findById(long userId) {
         return userRepository.findById(userId).orElseThrow(
                 () -> new EntityNotFoundException("회원정보를 찾을 수 없습니다.")
         );
     }
 
+    // 프로필 사진 업데이트
     public User profileSet(TokenUserInfo userInfo, MultipartFile imgFile) {
 
         String imagePath = UUID.randomUUID() + "_" + imgFile.getOriginalFilename();
@@ -156,6 +165,7 @@ public class UserService {
         return user;
     }
 
+    // 비밀번호 변경 (임시 비밀번호 지정)
     public User setNewPassword(String email, String newPw) {
         User user = userRepository.findByEmail(email).orElseThrow(
                 () -> new EntityNotFoundException("회원 정보를 찾을 수 없습니다.")
@@ -166,6 +176,7 @@ public class UserService {
         return user;
     }
 
+    // 회원 탈퇴
     public void withdraw(TokenUserInfo userInfo) {
         User user = userRepository.findByEmail(userInfo.getEmail()).orElseThrow(
                 () -> new EntityNotFoundException("회원 정보를 찾을 수 없습니다.")
