@@ -4,8 +4,6 @@ import com.spoton.spotonbackend.user.dto.response.UserResDto;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Objects;
-
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
@@ -35,9 +33,10 @@ public class User {
     private String profile;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     @Builder.Default
     @Setter
-    private boolean snsLinked = false;
+    private LoginType loginType = LoginType.COMMON;
 
     @Enumerated(EnumType.STRING)
     @Builder.Default
@@ -62,7 +61,7 @@ public class User {
                 .nickname(nickname)
                 .email(email)
                 .profile(profile)
-                .snsLinked(snsLinked)
+                .loginType(loginType)
                 .auth(auth)
                 .myTeam(myTeam)
                 .build();

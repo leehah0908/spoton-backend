@@ -1,5 +1,6 @@
 package com.spoton.spotonbackend.user.dto.response;
 
+import com.spoton.spotonbackend.user.entity.LoginType;
 import lombok.*;
 import com.spoton.spotonbackend.user.entity.Auth;
 import com.spoton.spotonbackend.user.entity.MyTeam;
@@ -16,7 +17,7 @@ public class UserResDto {
     private String nickname;
     private String email;
     private String profile;
-    private boolean snsLinked;
+    private LoginType loginType;
     private Auth auth;
     private MyTeam myTeam;
 }

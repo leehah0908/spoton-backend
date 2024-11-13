@@ -2,11 +2,11 @@ package com.spoton.spotonbackend.user.service;
 
 import com.spoton.spotonbackend.common.entity.CustomOAuth2User;
 import com.spoton.spotonbackend.user.dto.request.ReqSocialLoginDto;
+import com.spoton.spotonbackend.user.entity.LoginType;
 import com.spoton.spotonbackend.user.entity.MyTeam;
 import com.spoton.spotonbackend.user.entity.User;
 import com.spoton.spotonbackend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.query.NativeQuery;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -41,7 +41,8 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
             if (!isExist) {
                 socialSignup(properties.get("nickname"),
                         properties.get("profile_image"),
-                        kakaoAccount.get("email"));
+                        kakaoAccount.get("email"),
+                        LoginType.KAKAO);
             }
 
         } else if (clientName.equals("naver")) {
@@ -54,14 +55,15 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
             if (!isExist) {
                 socialSignup(resultMap.get("nickname"),
                         resultMap.get("profile_image"),
-                        resultMap.get("email"));
+                        resultMap.get("email"),
+                        LoginType.NAVER);
             }
         }
         return new CustomOAuth2User(email);
     }
 
     // 소셜 로그인 회원가입
-    public void socialSignup(String nickname, String profile, String email) {
+    public void socialSignup(String nickname, String profile, String email, LoginType loginType) {
         ReqSocialLoginDto newDto = ReqSocialLoginDto.builder()
                 .nickname(nickname)
                 .profile(profile)
@@ -70,7 +72,7 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
 
         User user = newDto.toUser(passwordEncoder);
         user.setPassword(UUID.randomUUID().toString());
-        user.setSnsLinked(true);
+        user.setLoginType(loginType);
         user.setMyTeam(new MyTeam());
 
         userRepository.save(user);

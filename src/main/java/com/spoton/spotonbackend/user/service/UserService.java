@@ -32,6 +32,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    // 회원가입
     public User signup(@Valid ReqSignupDto dto) {
 
         if (userRepository.findByEmail(dto.getEmail()).isPresent()) {

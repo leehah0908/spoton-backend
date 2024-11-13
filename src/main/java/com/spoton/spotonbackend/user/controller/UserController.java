@@ -4,10 +4,13 @@ import com.spoton.spotonbackend.common.auth.EmailProvider;
 import com.spoton.spotonbackend.common.auth.TokenUserInfo;
 import com.spoton.spotonbackend.common.dto.CommonErrorDto;
 import com.spoton.spotonbackend.user.dto.request.ReqPasswordChangeDto;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -54,20 +57,28 @@ public class UserController {
 
     // 로그인
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody ReqLoginDto dto){
+    public ResponseEntity<?> login(@Valid @RequestBody ReqLoginDto dto,
+                                   HttpServletResponse response){
 
         User user = userService.login(dto);
 
+        // 토큰 발급
         String accessToken = jwtTokenProvider.createAccessToken(user.getEmail(), user.getAuth().toString());
-
         String refreshToken = jwtTokenProvider.createRefreshToken(user.getEmail(), user.getAuth().toString());
-        redisTemplate.opsForValue().set(String.valueOf(user.getEmail()), refreshToken, 14400, TimeUnit.HOURS);
 
-        Map<String, Object> resMap = new HashMap<>();
-        resMap.put("token", accessToken);
-        resMap.put("user_id", user.getUserId());
+        // 리프레시 토큰 redis에 저장
+        redisTemplate.opsForValue().set(String.valueOf(user.getEmail()), refreshToken, 14400, TimeUnit.MINUTES);
 
-        CommonResDto resDto = new CommonResDto(HttpStatus.OK, "로그인 성공", resMap);
+        // 쿠키로 로그인 인증
+        Cookie cookie = new Cookie("access_token", accessToken);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(10 * 24 * 60 * 60); // 쿠키 유효기간 10일
+        cookie.setAttribute("SameSite", "None");
+        response.addCookie(cookie);
+
+        CommonResDto resDto = new CommonResDto(HttpStatus.OK, "로그인 성공", user.getUserId());
         return new ResponseEntity<>(resDto, HttpStatus.OK);
     }
 
@@ -75,9 +86,10 @@ public class UserController {
     // 이메일 중복 확인
     @GetMapping("/check_email")
     public ResponseEntity<?> checkEmail(@RequestParam String email){
+        System.out.println(email);
 
         boolean checkEmail = userService.checkEmail(email);
-
+        System.out.println("체크 결과: " + checkEmail);
         CommonResDto resDto = new CommonResDto(HttpStatus.OK, "사용가능한 이메일입니다.", checkEmail);
         return new ResponseEntity<>(resDto, HttpStatus.OK);
     }

@@ -23,6 +23,8 @@ public class CommonExceptionHandler {
     public ResponseEntity<CommonErrorDto> illegalHandler(IllegalArgumentException e){
         e.printStackTrace();
         CommonErrorDto commonErrorDto = new CommonErrorDto(HttpStatus.BAD_REQUEST,e.getMessage());
+        System.out.println(commonErrorDto.getStatusCode());
+        System.out.println(commonErrorDto.getStatusMessage());
         return new ResponseEntity<>(commonErrorDto, HttpStatus.BAD_REQUEST);
     }
 
