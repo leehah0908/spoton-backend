@@ -22,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -37,7 +38,10 @@ public class UserService {
     public User signup(@Valid ReqSignupDto dto) {
 
         if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
-            throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
+            User user = userRepository.findByEmail(dto.getEmail()).orElseThrow(
+                    () -> new EntityNotFoundException("회원 정보를 찾을 수 없습니다.")
+            );
+            throw new IllegalArgumentException("이미 " + user.getLoginType() + "로 가입된 이메일입니다.");
         }
 
         if (userRepository.findByNickname(dto.getNickname()).isPresent()) {
@@ -64,9 +68,11 @@ public class UserService {
 
     // 이메일 중복 체크
     public boolean checkEmail(String email) {
-
         if (userRepository.findByEmail(email).isPresent()) {
-            throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
+            User user = userRepository.findByEmail(email).orElseThrow(
+                    () -> new EntityNotFoundException("회원 정보를 찾을 수 없습니다.")
+            );
+            throw new IllegalArgumentException("이미 " + user.getLoginType() + "로 가입된 이메일입니다.");
         }
         return true;
     }
