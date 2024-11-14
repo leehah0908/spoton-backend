@@ -30,12 +30,14 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
         OAuth2User oAuth2User = super.loadUser(userRequest);
         String clientName = userRequest.getClientRegistration().getClientName();
         String email = null;
+        LoginType loginType = null;
 
         if (clientName.equals("kakao")) {
             Map<String, String> properties = (Map<String, String>) oAuth2User.getAttributes().get("properties");
             Map<String, String> kakaoAccount = (Map<String, String>) oAuth2User.getAttributes().get("kakao_account");
 
             email = kakaoAccount.get("email");
+            loginType = LoginType.KAKAO;
             boolean isExist = userRepository.findByEmail(email).isPresent();
 
             if (!isExist) {
@@ -50,6 +52,7 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
             System.out.println(resultMap);
 
             email = resultMap.get("email");
+            loginType = LoginType.NAVER;
             boolean isExist = userRepository.findByEmail(email).isPresent();
 
             if (!isExist) {
@@ -59,7 +62,7 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
                         LoginType.NAVER);
             }
         }
-        return new CustomOAuth2User(email);
+        return new CustomOAuth2User(email, loginType);
     }
 
     // 소셜 로그인 회원가입
