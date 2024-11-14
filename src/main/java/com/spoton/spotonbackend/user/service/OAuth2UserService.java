@@ -43,13 +43,12 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
             if (!isExist) {
                 socialSignup(properties.get("nickname"),
                         properties.get("profile_image"),
-                        kakaoAccount.get("email"),
-                        LoginType.KAKAO);
+                        email,
+                        loginType);
             }
 
         } else if (clientName.equals("naver")) {
             Map<String, String> resultMap = (Map<String, String>) oAuth2User.getAttributes().get("response");
-            System.out.println(resultMap);
 
             email = resultMap.get("email");
             loginType = LoginType.NAVER;
@@ -58,14 +57,27 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
             if (!isExist) {
                 socialSignup(resultMap.get("nickname"),
                         resultMap.get("profile_image"),
-                        resultMap.get("email"),
-                        LoginType.NAVER);
+                        email,
+                        loginType);
+            }
+        } else if (clientName.equals("Google")) {
+            Map<String, Object> resultMap = oAuth2User.getAttributes();
+
+            email = (String) resultMap.get("email");
+            loginType = LoginType.GOOGLE;
+            boolean isExist = userRepository.findByEmail(email).isPresent();
+
+            if (!isExist) {
+                socialSignup((String) resultMap.get("name"),
+                        (String) resultMap.get("picture"),
+                        email,
+                        loginType);
             }
         }
         return new CustomOAuth2User(email, loginType);
     }
 
-    // 소셜 로그인 회원가입
+    // 소셜 로그인 회원가입 (기존 가입 로그가 없을 때만)
     public void socialSignup(String nickname, String profile, String email, LoginType loginType) {
         ReqSocialLoginDto newDto = ReqSocialLoginDto.builder()
                 .nickname(nickname)
