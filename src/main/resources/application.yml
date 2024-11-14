@@ -89,3 +89,10 @@ jwt:
     expiration: 14400
     secretKey: ${RF_KEY}
 
+# log ??
+logging:
+  level:
+    org:
+      springframework:
+        security: DEBUG
+

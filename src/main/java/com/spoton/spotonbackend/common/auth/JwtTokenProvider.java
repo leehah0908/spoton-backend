@@ -27,6 +27,7 @@ public class JwtTokenProvider {
     @Value("${jwt.rf.expiration}")
     private int rfExpiration;
 
+    // 액세스 토큰 생성
     public String createAccessToken(String email, String auth) {
 
         Claims claims = Jwts.claims().setSubject(email);
@@ -42,6 +43,7 @@ public class JwtTokenProvider {
                 .compact();
     }
 
+    // 리프레시 토큰 생성
     public String createRefreshToken(String email, String auth) {
 
         Claims claims = Jwts.claims().setSubject(email);
@@ -57,12 +59,13 @@ public class JwtTokenProvider {
                 .compact();
     }
 
+    // 토큰 검증
     public TokenUserInfo validateAndGetTokenUserInfo(String token) throws Exception {
 
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(accSecretKey)
                 .build()
-                .parseClaimsJws(token)
+                .parseClaimsJws(token) // 토큰이 유효한지 검증
                 .getBody();
 
         return TokenUserInfo.builder()

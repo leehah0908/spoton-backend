@@ -47,7 +47,8 @@ public class SecurityConfig {
                                     "/user/refresh"
                             )
                             .permitAll()
-                            .anyRequest().authenticated();
+                            .anyRequest()
+                            .authenticated();
 
                 })
                 .oauth2Login(oauth2 -> oauth2
