@@ -53,6 +53,9 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
             email = resultMap.get("email");
             loginType = LoginType.NAVER;
             boolean isExist = userRepository.findByEmail(email).isPresent();
+            System.out.println(resultMap);
+            System.out.println(oAuth2User);
+            System.out.println(userRequest.getClientRegistration());
 
             if (!isExist) {
                 socialSignup(resultMap.get("nickname"),

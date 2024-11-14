@@ -1,5 +1,6 @@
 package com.spoton.spotonbackend.common.configs;
 
+import com.spoton.spotonbackend.common.auth.CustomLogoutSuccessHandler;
 import com.spoton.spotonbackend.common.auth.JwtAuthFilter;
 import com.spoton.spotonbackend.common.auth.OAuth2SuccessHandler;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ public class SecurityConfig {
     private final JwtAuthFilter jwtAuthFilter;
     private final DefaultOAuth2UserService defaultOAuth2UserService;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
+    private final CustomLogoutSuccessHandler customLogoutSuccessHandler;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -56,6 +58,8 @@ public class SecurityConfig {
                         .redirectionEndpoint(endpoint -> endpoint.baseUri("/oauth2/callback/*"))
                         .userInfoEndpoint(endpoint -> endpoint.userService(defaultOAuth2UserService))
                         .successHandler(oAuth2SuccessHandler))
+                .logout((logout) ->
+                        logout.logoutSuccessHandler(customLogoutSuccessHandler))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }

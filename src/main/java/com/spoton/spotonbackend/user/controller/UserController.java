@@ -87,46 +87,11 @@ public class UserController {
         return new ResponseEntity<>(resDto, HttpStatus.OK);
     }
 
-    @PostMapping("/logout")
-    public ResponseEntity<?> logout( @AuthenticationPrincipal TokenUserInfo userInfo,
-                                     HttpServletRequest request,
-                                    HttpServletResponse response) {
-        // 리프레시 토큰 값도 삭제 (db 효율성)
-        redisTemplate.delete(userInfo.getEmail());
-
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("access_token".equals(cookie.getName())) {
-                    cookie.setValue("");
-                    cookie.setPath("/");
-                    cookie.setMaxAge(0);
-                    cookie.setSecure(true);
-                    cookie.setHttpOnly(true);
-                    cookie.setAttribute("SameSite", "None");
-                    response.addCookie(cookie);
-
-                    CommonResDto resDto = new CommonResDto(HttpStatus.OK, "로그아웃 성공", null);
-                    return new ResponseEntity<>(resDto, HttpStatus.OK);
-                }
-            }
-        }
-
-        CommonErrorDto resDto = new CommonErrorDto(HttpStatus.UNAUTHORIZED, "로그아웃 실패");
-        return new ResponseEntity<>(resDto, HttpStatus.UNAUTHORIZED);
-    }
-
 
     // 로그인 후 회원 정보 응답
     @GetMapping("/login/check")
-    public ResponseEntity<?> checkAuthStatus() {
+    public ResponseEntity<?> checkAuthStatus(@AuthenticationPrincipal TokenUserInfo userInfo) {
 
-        // 이미 filter에서 검증 완료
-        // SecurityContext에서 인증 정보 가져오기
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        // 헤더에서 사용될 내용만 전달
-        TokenUserInfo userInfo = (TokenUserInfo) authentication.getPrincipal();
         String profile = userService.getProfile(userInfo.getEmail());
 
         Map<String,String> map = new HashMap<>();
