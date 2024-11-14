@@ -88,7 +88,11 @@ public class UserController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<?> logout( @AuthenticationPrincipal TokenUserInfo userInfo,
+                                     HttpServletRequest request,
+                                    HttpServletResponse response) {
+        // 리프레시 토큰 값도 삭제 (db 효율성)
+        redisTemplate.delete(userInfo.getEmail());
 
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
@@ -257,9 +261,9 @@ public class UserController {
 
     // 회원 정보 조회 (회원)
     @GetMapping("/my_info")
-    public ResponseEntity<?> myInfo() {
+    public ResponseEntity<?> myInfo(@AuthenticationPrincipal TokenUserInfo userInfo) {
 
-        UserResDto dto = userService.myInfo();
+        UserResDto dto = userService.myInfo(userInfo);
 
         CommonResDto resDto = new CommonResDto(HttpStatus.OK, "myinfo 조회 성공", dto);
 

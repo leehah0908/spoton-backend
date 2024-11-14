@@ -94,9 +94,7 @@ public class UserService {
     }
 
     // 마이페이지용 회원 개인 정보 조회
-    public UserResDto myInfo() {
-        TokenUserInfo userInfo =
-                (TokenUserInfo) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    public UserResDto myInfo(TokenUserInfo userInfo) {
 
         User user = userRepository.findByEmail(userInfo.getEmail()).orElseThrow(
                 () -> new EntityNotFoundException("회원 정보를 찾을 수 없습니다.")
