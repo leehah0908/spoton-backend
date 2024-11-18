@@ -3,6 +3,7 @@ package com.spoton.spotonbackend.user.controller;
 import com.spoton.spotonbackend.common.auth.EmailProvider;
 import com.spoton.spotonbackend.common.auth.TokenUserInfo;
 import com.spoton.spotonbackend.common.dto.CommonErrorDto;
+import com.spoton.spotonbackend.user.dto.request.ReqModifyDto;
 import com.spoton.spotonbackend.user.dto.request.ReqPasswordChangeDto;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -178,7 +179,6 @@ public class UserController {
     // 비밀번호 재발급
     @PostMapping("/pw_send")
     public ResponseEntity<?> sendPassword(@RequestParam String email){
-        System.out.println(email);
 
         String newPw = emailProvider.sendTemporaryPassword(email);
 
@@ -235,7 +235,7 @@ public class UserController {
 
     // 정보 수정 (닉네임, 마이팀)
     @PatchMapping("/modify")
-    public ResponseEntity<?> modify(@RequestBody ReqSignupDto dto,
+    public ResponseEntity<?> modify(@RequestBody ReqModifyDto dto,
                                     @AuthenticationPrincipal TokenUserInfo userInfo) {
 
         User user = userService.modify(userInfo, dto);

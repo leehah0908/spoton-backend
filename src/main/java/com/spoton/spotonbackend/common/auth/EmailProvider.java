@@ -6,6 +6,8 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 
+import javax.naming.ServiceUnavailableException;
+
 @Component
 @RequiredArgsConstructor
 public class EmailProvider {
@@ -57,7 +59,6 @@ public class EmailProvider {
         String temporaryPassword = makeRandomPassword();
 
         try {
-
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
 
@@ -68,7 +69,6 @@ public class EmailProvider {
             mimeMessageHelper.setText(htmlContent, true);
 
             mailSender.send(mimeMessage);
-
         } catch (Exception e) {
             e.printStackTrace();
             return "fail";

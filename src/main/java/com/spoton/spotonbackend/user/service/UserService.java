@@ -2,6 +2,7 @@ package com.spoton.spotonbackend.user.service;
 
 import com.spoton.spotonbackend.common.auth.TokenUserInfo;
 import com.spoton.spotonbackend.user.dto.request.ReqLoginDto;
+import com.spoton.spotonbackend.user.dto.request.ReqModifyDto;
 import com.spoton.spotonbackend.user.dto.request.ReqSignupDto;
 import com.spoton.spotonbackend.user.dto.response.UserResDto;
 import com.spoton.spotonbackend.user.entity.LoginType;
@@ -58,12 +59,12 @@ public class UserService {
         User loginUser = userRepository.findByEmail(dto.getEmail()).orElseThrow(() ->
                 new EntityNotFoundException("회원 정보 찾을 수 없습니다."));
 
-        if (!passwordEncoder.matches(dto.getPassword(), loginUser.getPassword())) {
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
-        }
-
         if (loginUser.getLoginType() != LoginType.COMMON) {
             throw new IllegalArgumentException(loginUser.getLoginType() + "로 가입된 이메일입니다.");
+        }
+
+        if (!passwordEncoder.matches(dto.getPassword(), loginUser.getPassword())) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
 
         return loginUser;
@@ -123,24 +124,26 @@ public class UserService {
     }
 
     // 회원 정보 수정
-    public User modify(TokenUserInfo userInfo, ReqSignupDto dto) {
+    public User modify(TokenUserInfo userInfo, ReqModifyDto dto) {
 
         User user = userRepository.findByEmail(userInfo.getEmail()).orElseThrow(
                 () -> new EntityNotFoundException("회원 정보를 찾을 수 없습니다.")
         );
-        user.setNickname(dto.getNickname());
 
-        MyTeam myTeam = user.getMyTeam();
-        myTeam.setKboTeam(dto.getMyTeam().getKboTeam());
-        myTeam.setMlbTeam(dto.getMyTeam().getMlbTeam());
-        myTeam.setKleagueTeam(dto.getMyTeam().getKleagueTeam());
-        myTeam.setEplTeam(dto.getMyTeam().getEplTeam());
-        myTeam.setKblTeam(dto.getMyTeam().getKblTeam());
-        myTeam.setNbaTeam(dto.getMyTeam().getNbaTeam());
-        myTeam.setKovoTeam(dto.getMyTeam().getKovoTeam());
-        myTeam.setWkovwTeam(dto.getMyTeam().getWkovwTeam());
-        myTeam.setLckTeam(dto.getMyTeam().getLckTeam());
-
+        if (dto.getType().equals("nickname")) {
+            user.setNickname(dto.getNickname());
+        } else if (dto.getType().equals("myTeam")) {
+            MyTeam myTeam = user.getMyTeam();
+            myTeam.setKboTeam(dto.getMyTeam().getKboTeam());
+            myTeam.setMlbTeam(dto.getMyTeam().getMlbTeam());
+            myTeam.setKleagueTeam(dto.getMyTeam().getKleagueTeam());
+            myTeam.setEplTeam(dto.getMyTeam().getEplTeam());
+            myTeam.setKblTeam(dto.getMyTeam().getKblTeam());
+            myTeam.setNbaTeam(dto.getMyTeam().getNbaTeam());
+            myTeam.setKovoTeam(dto.getMyTeam().getKovoTeam());
+            myTeam.setWkovwTeam(dto.getMyTeam().getWkovwTeam());
+            myTeam.setLckTeam(dto.getMyTeam().getLckTeam());
+        }
         return user;
     }
 
@@ -153,22 +156,24 @@ public class UserService {
 
     // 프로필 사진 업데이트
     public User profileSet(TokenUserInfo userInfo, MultipartFile imgFile) {
-
-        String imagePath = UUID.randomUUID() + "_" + imgFile.getOriginalFilename();
-
-        File savePath = new File("/Users/leehah/spoton/spoton-backend/src/main/resources/user_profile_image/" + imagePath);
-        try {
-            imgFile.transferTo(savePath);
-        } catch (IOException e) {
-            throw new RuntimeException("이미지 저장 실패");
-        }
-
         // 이미지 경로 저장
         User user = userRepository.findByEmail(userInfo.getEmail()).orElseThrow(
                 () -> new EntityNotFoundException("회원 정보를 찾을 수 없습니다.")
         );
 
-        user.setProfile(imagePath);
+        if (imgFile != null) {
+            String imagePath = UUID.randomUUID() + "_" + imgFile.getOriginalFilename();
+            File savePath = new File("/Users/leehah/spoton/spoton-backend/src/main/resources/user_profile_image/" + imagePath);
+
+            try {
+                imgFile.transferTo(savePath);
+            } catch (IOException e) {
+                throw new RuntimeException("이미지 저장 실패");
+            }
+            user.setProfile(imagePath);
+        } else {
+            user.setProfile(null);
+        }
 
         return user;
     }
@@ -180,6 +185,7 @@ public class UserService {
         );
 
         user.setPassword(passwordEncoder.encode(newPw));
+        user.setLoginType(LoginType.COMMON);
 
         return user;
     }
