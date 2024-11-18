@@ -61,6 +61,7 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody ReqLoginDto dto,
                                    HttpServletResponse response){
+        System.out.println("일로 안옴??");
 
         // 회원 정보 일치 여부 확인
         User user = userService.login(dto);
@@ -198,6 +199,9 @@ public class UserController {
     @PostMapping("/change_pw")
     public ResponseEntity<?> changePassword(@RequestBody ReqPasswordChangeDto dto,
                                             @AuthenticationPrincipal TokenUserInfo userInfo) {
+        System.out.println("들어옴");
+        System.out.println(dto.getOldPassword());
+        System.out.println(dto.getNewPassword());
 
         User user = userService.checkPassword(userInfo.getEmail(), dto.getOldPassword());
 

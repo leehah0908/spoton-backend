@@ -11,7 +11,6 @@ import lombok.*;
 public class ReqPasswordChangeDto {
 
     private String oldPassword;
-
     private String newPassword;
 
 }

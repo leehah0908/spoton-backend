@@ -187,6 +187,7 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(newPw));
         user.setLoginType(LoginType.COMMON);
 
+        System.out.println("변경완료");
         return user;
     }
 
