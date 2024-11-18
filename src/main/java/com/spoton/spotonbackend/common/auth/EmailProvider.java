@@ -20,7 +20,6 @@ public class EmailProvider {
         int number = makeRandomNumber();
 
         try {
-
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
 
