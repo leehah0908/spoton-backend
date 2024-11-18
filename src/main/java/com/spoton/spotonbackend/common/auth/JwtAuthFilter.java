@@ -30,9 +30,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
+        String requestURI = request.getRequestURI();
+
+        if ("/user/refresh".equals(requestURI)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         String token = getTokenFromCookie(request);
-
         try {
             if (token != null) {
                 TokenUserInfo userInfo = jwtTokenProvider.validateAndGetTokenUserInfo(token);
@@ -52,7 +57,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         } catch (Exception e) {
                 response.setStatus(HttpStatus.UNAUTHORIZED.value());
-                response.setContentType("application/json");
+                response.setContentType("application/json; charset=UTF-8" );
+                response.setCharacterEncoding("UTF-8");
                 response.getWriter().write("토큰에 문제가 있음 (filter)");
         }
     }

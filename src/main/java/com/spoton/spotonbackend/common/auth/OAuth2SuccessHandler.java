@@ -54,6 +54,14 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         cookie.setMaxAge(10 * 24 * 60 * 60); // 쿠키 유효기간 10일
         cookie.setAttribute("SameSite", "None");
 
+        Cookie userIdCookie = new Cookie("userId", String.valueOf(user.getUserId()));
+        userIdCookie.setHttpOnly(true);
+        userIdCookie.setSecure(true);
+        userIdCookie.setPath("/");
+        userIdCookie.setMaxAge(10 * 24 * 60 * 60); // 쿠키 유효기간 10일
+        userIdCookie.setAttribute("SameSite", "None");
+        response.addCookie(userIdCookie);
+
         response.addCookie(cookie);
         response.sendRedirect("http://localhost:3000");
     }

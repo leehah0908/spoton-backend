@@ -147,13 +147,6 @@ public class UserService {
         return user;
     }
 
-    // id로 유저 정보 찾기 (access 토큰 재발급시 필요)
-    public User findById(long userId) {
-        return userRepository.findById(userId).orElseThrow(
-                () -> new EntityNotFoundException("회원정보를 찾을 수 없습니다.")
-        );
-    }
-
     // 프로필 사진 업데이트
     public User profileSet(TokenUserInfo userInfo, MultipartFile imgFile) {
         // 이미지 경로 저장
@@ -207,5 +200,11 @@ public class UserService {
         );
 
         return user.getProfile();
+    }
+
+    public User findById(Long id) {
+        return userRepository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException("회원 정보를 찾을 수 없습니다.")
+        );
     }
 }

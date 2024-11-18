@@ -61,7 +61,6 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody ReqLoginDto dto,
                                    HttpServletResponse response){
-        System.out.println("일로 안옴??");
 
         // 회원 정보 일치 여부 확인
         User user = userService.login(dto);
@@ -81,6 +80,14 @@ public class UserController {
         cookie.setMaxAge(10 * 24 * 60 * 60); // 쿠키 유효기간 10일
         cookie.setAttribute("SameSite", "None");
         response.addCookie(cookie);
+
+        Cookie userIdCookie = new Cookie("userId", String.valueOf(user.getUserId()));
+        userIdCookie.setHttpOnly(true);
+        userIdCookie.setSecure(true);
+        userIdCookie.setPath("/");
+        userIdCookie.setMaxAge(10 * 24 * 60 * 60); // 쿠키 유효기간 10일
+        userIdCookie.setAttribute("SameSite", "None");
+        response.addCookie(userIdCookie);
 
         CommonResDto resDto = new CommonResDto(HttpStatus.OK, "로그인 성공", user.getUserId());
         return new ResponseEntity<>(resDto, HttpStatus.OK);
@@ -199,7 +206,6 @@ public class UserController {
     @PostMapping("/change_pw")
     public ResponseEntity<?> changePassword(@RequestBody ReqPasswordChangeDto dto,
                                             @AuthenticationPrincipal TokenUserInfo userInfo) {
-        System.out.println("들어옴");
         System.out.println(dto.getOldPassword());
         System.out.println(dto.getNewPassword());
 
@@ -265,8 +271,11 @@ public class UserController {
 
     // 토큰 재요청시 refresh token 확인 후 발급
     @PostMapping("/refresh")
-    public ResponseEntity<?> refreshToken(@RequestBody String userId) {
-        User user = userService.findById(Long.parseLong(userId));
+    public ResponseEntity<?> refreshToken(@CookieValue("userId") String userId,
+                                          HttpServletResponse response) {
+
+        System.out.println("받아왔다??" + userId);
+        User user = userService.findById(Long.valueOf(userId));
 
         Object refreshToken = redisTemplate.opsForValue().get(user.getEmail());
 
@@ -278,13 +287,28 @@ public class UserController {
 
         String newAccessToken = jwtTokenProvider.createAccessToken(user.getEmail(), user.getAuth().toString());
 
-        Map<String, Object> map = new HashMap<>();
-        map.put("token", newAccessToken);
+        // 쿠키로 로그인 인증
+        Cookie cookie = new Cookie("access_token", newAccessToken);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(10 * 24 * 60 * 60); // 쿠키 유효기간 10일
+        cookie.setAttribute("SameSite", "None");
+        response.addCookie(cookie);
 
-        CommonResDto resDto = new CommonResDto(HttpStatus.OK, "토큰 재발급 성공", map);
+        Cookie userIdCookie = new Cookie("userId", String.valueOf(user.getUserId()));
+        userIdCookie.setHttpOnly(true);
+        userIdCookie.setSecure(true);
+        userIdCookie.setPath("/");
+        userIdCookie.setMaxAge(10 * 24 * 60 * 60); // 쿠키 유효기간 10일
+        userIdCookie.setAttribute("SameSite", "None");
+        response.addCookie(userIdCookie);
+
+        CommonResDto resDto = new CommonResDto(HttpStatus.OK, "로그인 성공", user.getUserId());
 
         return new ResponseEntity<>(resDto, HttpStatus.OK);
     }
+
 
 
     // 회원 탈퇴
