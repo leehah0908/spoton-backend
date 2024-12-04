@@ -7,13 +7,14 @@ import com.spoton.spotonbackend.board.dto.request.ReqBoardModifyDto;
 import com.spoton.spotonbackend.board.dto.request.ReqBoardSearchDto;
 import com.spoton.spotonbackend.board.dto.response.ResBoardDto;
 import com.spoton.spotonbackend.board.entity.Board;
+import com.spoton.spotonbackend.board.entity.BoardLike;
+import com.spoton.spotonbackend.board.repository.BoardLikeRepository;
 import com.spoton.spotonbackend.board.repository.BoardRepository;
 import com.spoton.spotonbackend.common.auth.TokenUserInfo;
 import com.spoton.spotonbackend.user.entity.User;
 import com.spoton.spotonbackend.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.BadRequestException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -32,6 +33,7 @@ public class BoardService {
     private final JPAQueryFactory queryFactory;
     private final BoardRepository boardRepository;
     private final UserRepository userRepository;
+    private final BoardLikeRepository boardLikeRepository;
 
     public Board create(ReqBoardCreateDto dto, TokenUserInfo userInfo) {
 
@@ -151,5 +153,39 @@ public class BoardService {
         board.setViewCount(viewCount);
 
         return board;
+    }
+
+    public BoardLike addLikeCount(Long boardId, TokenUserInfo userInfo) {
+
+        User user = userRepository.findByEmail(userInfo.getEmail()).orElseThrow(
+                () -> new EntityNotFoundException("회원 정보를 찾을 수 없습니다.")
+        );
+
+        Board board = boardRepository.findById(boardId).orElseThrow(
+                () -> new EntityNotFoundException("게시물을 찾을 수 없습니다.")
+        );
+
+        if (boardLikeRepository.existsByUserIdAndBoardId(user.getUserId(), boardId)) {
+            throw new IllegalStateException("이미 좋아요를 한 유저입니다.");
+        }
+
+        BoardLike boardLike = new BoardLike();
+        boardLike.setBoard(board);
+        boardLike.setUser(user);
+
+        return boardLikeRepository.save(boardLike);
+    }
+
+    public void cancelLikeCount(Long boardId, TokenUserInfo userInfo) {
+
+        User user = userRepository.findByEmail(userInfo.getEmail()).orElseThrow(
+                () -> new EntityNotFoundException("회원 정보를 찾을 수 없습니다.")
+        );
+
+        BoardLike boardLike = boardLikeRepository.findByUserIdAndBoardId(user.getUserId(), boardId).orElseThrow(
+                () -> new EntityNotFoundException("좋아요 로그를 찾을 수 없습니다.")
+        );
+
+        boardLikeRepository.delete(boardLike);
     }
 }

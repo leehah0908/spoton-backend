@@ -6,6 +6,7 @@ import com.spoton.spotonbackend.board.dto.request.ReqBoardSearchDto;
 import com.spoton.spotonbackend.board.dto.request.ReqReportDto;
 import com.spoton.spotonbackend.board.dto.response.ResBoardDto;
 import com.spoton.spotonbackend.board.entity.Board;
+import com.spoton.spotonbackend.board.entity.BoardLike;
 import com.spoton.spotonbackend.board.service.BoardService;
 import com.spoton.spotonbackend.common.auth.EmailProvider;
 import com.spoton.spotonbackend.common.auth.TokenUserInfo;
@@ -112,22 +113,27 @@ public class BoardController {
         return new ResponseEntity<>(resDto, HttpStatus.OK);
     }
 
-    // 좋아요 수
-    @PostMapping("/like")
-    public ResponseEntity<?> increaseLikeCount(@RequestBody ReqReportDto dto,
-                                        @AuthenticationPrincipal TokenUserInfo userInfo){
+    // 좋아요 추가
+    @PostMapping("/like_add")
+    public ResponseEntity<?> addLikeCount(@RequestParam Long boardId,
+                                          @AuthenticationPrincipal TokenUserInfo userInfo){
 
-        // 관리자에게 신고 내역 보내기
-        String result = emailProvider.sendReportMail(dto, userInfo);
-        if (result.equals("fail")) {
-            CommonErrorDto errorDto = new CommonErrorDto(HttpStatus.SERVICE_UNAVAILABLE, "신고 실패, 다시 확인해주세요.");
-            return new ResponseEntity<>(errorDto, HttpStatus.SERVICE_UNAVAILABLE);
-        }
+        // 좋아요 증가
+        BoardLike boardLike = boardService.addLikeCount(boardId, userInfo);
 
-        // 신고 카운트 증가
-        Board board = boardService.increaseReportCount(dto.getBoardId());
+        CommonResDto resDto = new CommonResDto(HttpStatus.OK, "좋아요 추가 성공", boardLike);
+        return new ResponseEntity<>(resDto, HttpStatus.OK);
+    }
 
-        CommonResDto resDto = new CommonResDto(HttpStatus.OK, "게시물 신고 성공", board.getBoardId());
+    // 좋아요 삭제
+    @PostMapping("/like_cancel")
+    public ResponseEntity<?> cancelLikeCount(@RequestParam Long boardId,
+                                             @AuthenticationPrincipal TokenUserInfo userInfo){
+
+        // 좋아요 삭제
+        boardService.cancelLikeCount(boardId, userInfo);
+
+        CommonResDto resDto = new CommonResDto(HttpStatus.OK, "좋아요 삭제 성공", true);
         return new ResponseEntity<>(resDto, HttpStatus.OK);
     }
 }
