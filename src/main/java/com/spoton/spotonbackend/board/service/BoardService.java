@@ -138,4 +138,18 @@ public class BoardService {
 
         return board;
     }
+
+    public Board increaseViewCount(Long boardId) {
+
+        Board board = boardRepository.findById(boardId).orElseThrow(
+                () -> new EntityNotFoundException("게시물을 찾을 수 없습니다.")
+        );
+
+        Long viewCount = board.getViewCount();
+        viewCount += 1;
+
+        board.setViewCount(viewCount);
+
+        return board;
+    }
 }

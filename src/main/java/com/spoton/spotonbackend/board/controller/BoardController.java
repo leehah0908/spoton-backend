@@ -103,13 +103,12 @@ public class BoardController {
 
     // 조회수 증가
     @PostMapping("/view")
-    public ResponseEntity<?> increaseViewCount(@RequestBody ReqReportDto dto,
-                                               @AuthenticationPrincipal TokenUserInfo userInfo){
+    public ResponseEntity<?> increaseViewCount(@RequestParam Long boardId){
 
-        // 신고 카운트 증가
-        Board board = boardService.increaseReportCount(dto.getBoardId());
+        // 조회수 카운트 증가
+        Board board = boardService.increaseViewCount(boardId);
 
-        CommonResDto resDto = new CommonResDto(HttpStatus.OK, "게시물 신고 성공", board.getBoardId());
+        CommonResDto resDto = new CommonResDto(HttpStatus.OK, "조회수 증가 성공", board.getBoardId());
         return new ResponseEntity<>(resDto, HttpStatus.OK);
     }
 
