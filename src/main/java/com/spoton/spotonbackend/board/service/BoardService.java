@@ -110,9 +110,9 @@ public class BoardService {
         return board;
     }
 
-    public void delete(ReqBoardModifyDto dto, TokenUserInfo userInfo) {
+    public void delete(Long boardId, TokenUserInfo userInfo) {
 
-        Board board = boardRepository.findById(dto.getBoardId()).orElseThrow(
+        Board board = boardRepository.findById(boardId).orElseThrow(
                 () -> new EntityNotFoundException("게시물을 찾을 수 없습니다.")
         );
 

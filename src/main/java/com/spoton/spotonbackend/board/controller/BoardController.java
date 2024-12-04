@@ -3,7 +3,7 @@ package com.spoton.spotonbackend.board.controller;
 import com.spoton.spotonbackend.board.dto.request.ReqBoardCreateDto;
 import com.spoton.spotonbackend.board.dto.request.ReqBoardModifyDto;
 import com.spoton.spotonbackend.board.dto.request.ReqBoardSearchDto;
-import com.spoton.spotonbackend.board.dto.request.ReqReportDto;
+import com.spoton.spotonbackend.board.dto.request.ReqBoardReportDto;
 import com.spoton.spotonbackend.board.dto.response.ResBoardDto;
 import com.spoton.spotonbackend.board.entity.Board;
 import com.spoton.spotonbackend.board.entity.BoardLike;
@@ -64,10 +64,10 @@ public class BoardController {
 
     // 게시물 삭제
     @PostMapping("/delete")
-    public ResponseEntity<?> boardDelete(@RequestBody ReqBoardModifyDto dto,
+    public ResponseEntity<?> boardDelete(@RequestParam Long boardId,
                                          @AuthenticationPrincipal TokenUserInfo userInfo){
 
-        boardService.delete(dto, userInfo);
+        boardService.delete(boardId, userInfo);
 
         CommonResDto resDto = new CommonResDto(HttpStatus.OK, "게시글 삭제 완료", true);
         return new ResponseEntity<>(resDto, HttpStatus.OK);
@@ -85,11 +85,11 @@ public class BoardController {
 
     // 게시물 신고 (관리자에게 내역 메일 보내기)
     @PostMapping("/report")
-    public ResponseEntity<?> sendReport(@RequestBody ReqReportDto dto,
-                                        @AuthenticationPrincipal TokenUserInfo userInfo){
+    public ResponseEntity<?> sendBoardReport(@RequestBody ReqBoardReportDto dto,
+                                             @AuthenticationPrincipal TokenUserInfo userInfo){
 
         // 관리자에게 신고 내역 보내기
-        String result = emailProvider.sendReportMail(dto, userInfo);
+        String result = emailProvider.sendReportMail(dto.getBoardId(), dto.getReportContent(), userInfo, "게시물");
         if (result.equals("fail")) {
             CommonErrorDto errorDto = new CommonErrorDto(HttpStatus.SERVICE_UNAVAILABLE, "신고 실패, 다시 확인해주세요.");
             return new ResponseEntity<>(errorDto, HttpStatus.SERVICE_UNAVAILABLE);

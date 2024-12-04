@@ -8,10 +8,9 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ReqBoardModifyDto {
+public class ReqReplyModifyDto {
 
-    private Long boardId;
-    private String subject;
     private String content;
-    private int leagueId;
+    private Long replyId;
+
 }

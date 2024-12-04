@@ -1,6 +1,6 @@
 package com.spoton.spotonbackend.common.auth;
 
-import com.spoton.spotonbackend.board.dto.request.ReqReportDto;
+import com.spoton.spotonbackend.board.dto.request.ReqBoardReportDto;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -111,7 +111,10 @@ public class EmailProvider {
 
 
     // 신고 내역 메일 보내기
-    public String sendReportMail(ReqReportDto dto, TokenUserInfo userInfo) {
+    public String sendReportMail(Long id,
+                                 String content,
+                                 TokenUserInfo userInfo,
+                                 String type) {
 
         String subject = "[SpotOn] 신고 내역 메일입니다.";
 
@@ -119,7 +122,7 @@ public class EmailProvider {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
 
-            String htmlContent = getReportDetail(dto, userInfo);
+            String htmlContent = getReportDetail(id, content, userInfo, type);
 
             mimeMessageHelper.setTo("leehah0908@naver.com");
             mimeMessageHelper.setSubject(subject);
@@ -134,15 +137,18 @@ public class EmailProvider {
         return "success";
     }
 
-    private String getReportDetail(ReqReportDto dto, TokenUserInfo userInfo) {
+    private String getReportDetail(Long id,
+                                   String content,
+                                   TokenUserInfo userInfo,
+                                   String type) {
         String reportDetail = "";
 
         reportDetail += "<div>\n" +
                 userInfo.getEmail() + "님이" +
                 "<br>\n" +
-                "<strong style=\"font-size: 30px;\">아래와 같은 이유로" + dto.getBoardId() + " 게시물을 신고했습니다.</strong>" +
+                "<strong style=\"font-size: 30px;\">아래와 같은 이유로" + id + " " + type + "을 신고했습니다.</strong>" +
                 "<br>\n" +
-                dto.getReportContent() +
+                content +
                 "</div>";
 
         return reportDetail;

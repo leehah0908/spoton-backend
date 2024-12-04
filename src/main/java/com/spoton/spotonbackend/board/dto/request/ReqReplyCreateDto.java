@@ -1,5 +1,6 @@
 package com.spoton.spotonbackend.board.dto.request;
 
+import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
 
 @Setter
@@ -8,10 +9,11 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ReqBoardModifyDto {
+public class ReqReplyCreateDto {
 
-    private Long boardId;
-    private String subject;
+    @NotEmpty(message = "내용은 필수값입니다.")
     private String content;
-    private int leagueId;
+
+    private Long bookId;
+
 }
