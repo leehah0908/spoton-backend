@@ -1,5 +1,6 @@
 package com.spoton.spotonbackend.user.entity;
 
+import com.spoton.spotonbackend.common.entity.BaseTimeEntity;
 import com.spoton.spotonbackend.user.dto.response.UserResDto;
 import jakarta.persistence.*;
 import lombok.*;
@@ -11,7 +12,7 @@ import lombok.*;
 
 @Entity
 @Table(name = "user")
-public class User {
+public class User extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
