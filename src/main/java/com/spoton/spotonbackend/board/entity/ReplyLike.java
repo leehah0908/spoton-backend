@@ -19,10 +19,12 @@ public class ReplyLike {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
+    @Setter
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "board_id", nullable = false)
-    private Board board;
+    @JoinColumn(name = "reply_id", nullable = false)
+    @Setter
+    private Reply reply;
 
 }

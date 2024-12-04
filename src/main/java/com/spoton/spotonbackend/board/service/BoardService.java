@@ -38,7 +38,7 @@ public class BoardService {
     public Board create(ReqBoardCreateDto dto, TokenUserInfo userInfo) {
 
         User user = userRepository.findByEmail(userInfo.getEmail()).orElseThrow(
-                () -> new EntityNotFoundException("회원 정보를 찾을 수 없습니다.")
+                () -> new EntityNotFoundException("작성자 정보를 찾을 수 없습니다.")
         );
 
         Board board = dto.toBoard();
@@ -61,7 +61,7 @@ public class BoardService {
         }
 
         // 검색 및 페이징 처리
-        List<Board> rawProducts = queryFactory
+        List<Board> rawBoards = queryFactory
                 .selectFrom(board)
                 .where(builder)
                 .offset(pageable.getOffset())
@@ -75,7 +75,7 @@ public class BoardService {
                 .fetchCount();
 
         // page 객체 생성.
-        Page<Board> boards = new PageImpl<>(rawProducts, pageable, total);
+        Page<Board> boards = new PageImpl<>(rawBoards, pageable, total);
 
         return boards.map(Board::toResBoardDto);
     }
@@ -165,7 +165,7 @@ public class BoardService {
                 () -> new EntityNotFoundException("게시물을 찾을 수 없습니다.")
         );
 
-        if (boardLikeRepository.existsByUserIdAndBoardId(user.getUserId(), boardId)) {
+        if (boardLikeRepository.existsByUser_UserIdAndBoard_BoardId(user.getUserId(), boardId)) {
             throw new IllegalStateException("이미 좋아요를 한 유저입니다.");
         }
 
@@ -182,7 +182,7 @@ public class BoardService {
                 () -> new EntityNotFoundException("회원 정보를 찾을 수 없습니다.")
         );
 
-        BoardLike boardLike = boardLikeRepository.findByUserIdAndBoardId(user.getUserId(), boardId).orElseThrow(
+        BoardLike boardLike = boardLikeRepository.findByUser_UserIdAndBoard_BoardId(user.getUserId(), boardId).orElseThrow(
                 () -> new EntityNotFoundException("좋아요 로그를 찾을 수 없습니다.")
         );
 

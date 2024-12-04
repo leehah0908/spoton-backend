@@ -14,6 +14,6 @@ public class ReqReplyCreateDto {
     @NotEmpty(message = "내용은 필수값입니다.")
     private String content;
 
-    private Long bookId;
-
+    @NotEmpty(message = "게시물 아이디는 필수값입니다.")
+    private Long boardId;
 }

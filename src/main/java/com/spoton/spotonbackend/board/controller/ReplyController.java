@@ -3,6 +3,7 @@ package com.spoton.spotonbackend.board.controller;
 import com.spoton.spotonbackend.board.dto.request.ReqReplyCreateDto;
 import com.spoton.spotonbackend.board.dto.request.ReqReplyModifyDto;
 import com.spoton.spotonbackend.board.dto.request.ReqReplyReportDto;
+import com.spoton.spotonbackend.board.dto.response.ResReplyDto;
 import com.spoton.spotonbackend.board.entity.Reply;
 import com.spoton.spotonbackend.board.entity.ReplyLike;
 import com.spoton.spotonbackend.board.service.ReplyService;
@@ -32,7 +33,7 @@ public class ReplyController {
     @GetMapping("/list")
     public ResponseEntity<?> replyList(@RequestParam Long boardId, Pageable pageable){
 
-        Page<Reply> replies = replyService.list(boardId, pageable);
+        Page<ResReplyDto> replies = replyService.list(boardId, pageable);
 
         CommonResDto resDto = new CommonResDto(HttpStatus.OK, "댓글 조회 완료", replies);
         return new ResponseEntity<>(resDto, HttpStatus.OK);
