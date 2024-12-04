@@ -1,12 +1,11 @@
 package com.spoton.spotonbackend.common.auth;
 
+import com.spoton.spotonbackend.board.dto.request.ReqReportDto;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
-
-import javax.naming.ServiceUnavailableException;
 
 @Component
 @RequiredArgsConstructor
@@ -14,6 +13,7 @@ public class EmailProvider {
 
     private final JavaMailSender mailSender;
 
+    // 이메일 인증 메일 보내기
     public Integer sendCertificationMail(String email) {
 
         String subject = "[SpotOn] 이메일 인증 메일입니다.";
@@ -52,6 +52,13 @@ public class EmailProvider {
         return certificationMessage;
     }
 
+    private int makeRandomNumber() {
+        // 난수의 범위: 111111 ~ 999999 (6자리)
+        return (int) ((Math.random() * 888889) + 111111);
+    }
+
+
+    // 임시 비밀번호 메일 보내기
     public String sendTemporaryPassword(String email) {
 
         String subject = "[SpotOn] 임시 비밀번호입니다.";
@@ -89,11 +96,6 @@ public class EmailProvider {
         return temporaryPasswordMessage;
     }
 
-    private int makeRandomNumber() {
-        // 난수의 범위: 111111 ~ 999999 (6자리)
-        return (int) ((Math.random() * 888889) + 111111);
-    }
-
     private String makeRandomPassword() {
         char[] charSet = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F',
                 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' };
@@ -105,5 +107,44 @@ public class EmailProvider {
             newPw.append(charSet[idx]);
         }
         return newPw.toString();
+    }
+
+
+    // 신고 내역 메일 보내기
+    public String sendReportMail(ReqReportDto dto, TokenUserInfo userInfo) {
+
+        String subject = "[SpotOn] 신고 내역 메일입니다.";
+
+        try {
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
+
+            String htmlContent = getReportDetail(dto, userInfo);
+
+            mimeMessageHelper.setTo("leehah0908@naver.com");
+            mimeMessageHelper.setSubject(subject);
+            mimeMessageHelper.setText(htmlContent, true);
+
+            mailSender.send(mimeMessage);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "fail";
+        }
+        return "success";
+    }
+
+    private String getReportDetail(ReqReportDto dto, TokenUserInfo userInfo) {
+        String reportDetail = "";
+
+        reportDetail += "<div>\n" +
+                userInfo.getEmail() + "님이" +
+                "<br>\n" +
+                "<strong style=\"font-size: 30px;\">아래와 같은 이유로" + dto.getBoardId() + " 게시물을 신고했습니다.</strong>" +
+                "<br>\n" +
+                dto.getReportContent() +
+                "</div>";
+
+        return reportDetail;
     }
 }
