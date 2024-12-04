@@ -46,6 +46,8 @@ public class SecurityConfig {
                                     "/user/pw_send",
                                     "/user/check_email",
                                     "/user/check_nickname",
+                                    "/board/list",
+                                    "/board/detail",
                                     "/user/refresh"
                             )
                             .permitAll()
