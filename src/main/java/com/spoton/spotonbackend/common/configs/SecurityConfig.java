@@ -48,6 +48,7 @@ public class SecurityConfig {
                                     "/user/check_nickname",
                                     "/board/list",
                                     "/board/detail",
+                                    "/game/list",
                                     "/user/refresh"
                             )
                             .permitAll()
