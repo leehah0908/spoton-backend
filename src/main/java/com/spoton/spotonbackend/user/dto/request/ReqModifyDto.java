@@ -1,7 +1,6 @@
 package com.spoton.spotonbackend.user.dto.request;
 
 import com.spoton.spotonbackend.user.entity.MyTeam;
-import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
 
 @Getter

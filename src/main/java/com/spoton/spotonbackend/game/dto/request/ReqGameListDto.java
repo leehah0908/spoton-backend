@@ -1,6 +1,5 @@
 package com.spoton.spotonbackend.game.dto.request;
 
-import com.spoton.spotonbackend.user.entity.MyTeam;
 import lombok.*;
 
 @Setter
