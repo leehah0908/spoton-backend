@@ -48,6 +48,7 @@ public class SecurityConfig {
                                     "/user/check_nickname",
                                     "/board/list",
                                     "/board/detail",
+                                    "/board/view",
                                     "/game/list",
                                     "/user/refresh"
                             )

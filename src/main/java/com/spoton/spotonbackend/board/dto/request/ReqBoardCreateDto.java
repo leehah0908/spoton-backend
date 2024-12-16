@@ -18,13 +18,13 @@ public class ReqBoardCreateDto {
     @NotEmpty(message = "내용은 필수값입니다.")
     private String content;
 
-    private int leagueId;
+    private String sports;
 
     public Board toBoard() {
         return Board.builder()
                 .subject(subject)
                 .content(content)
-                .leagueId(leagueId)
+                .sports(sports)
                 .build();
     }
 }

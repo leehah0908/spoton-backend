@@ -1,11 +1,13 @@
 package com.spoton.spotonbackend.board.entity;
 
-import com.spoton.spotonbackend.board.dto.response.ResBoardDto;
 import com.spoton.spotonbackend.board.dto.response.ResReplyDto;
 import com.spoton.spotonbackend.common.entity.BaseTimeEntity;
 import com.spoton.spotonbackend.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @AllArgsConstructor
@@ -31,15 +33,21 @@ public class Reply extends BaseTimeEntity {
     @Setter
     private Long reportCount = 0L;
 
+    @Setter
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    @Setter
     private User user;
 
+    @Setter
     @ManyToOne
     @JoinColumn(name = "board_id", nullable = false)
-    @Setter
     private Board board;
+
+    @OneToMany(mappedBy = "reply", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ReplyLike> likes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "reply", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ReplyReport> replyReports = new ArrayList<>();
 
     public ResReplyDto toResReplyDto() {
         return ResReplyDto.builder()

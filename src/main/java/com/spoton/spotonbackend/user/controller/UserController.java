@@ -103,6 +103,7 @@ public class UserController {
         Map<String,String> map = new HashMap<>();
         map.put("profile", profile);
         map.put("auth", String.valueOf(userInfo.getAuth()));
+        map.put("email", userInfo.getEmail());
 
         CommonResDto resDto = new CommonResDto(HttpStatus.OK, "로그인 완료!", map);
         return new ResponseEntity<>(resDto, HttpStatus.OK);

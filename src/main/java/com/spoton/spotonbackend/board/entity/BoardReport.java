@@ -10,12 +10,12 @@ import lombok.*;
 @Builder
 
 @Entity
-@Table(name = "board_like")
-public class BoardLike {
+@Table(name = "board_report")
+public class BoardReport {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long boardLikeId;
+    private Long boardReportId;
 
     @Setter
     @ManyToOne

@@ -4,13 +4,17 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.spoton.spotonbackend.board.dto.request.ReqBoardCreateDto;
 import com.spoton.spotonbackend.board.dto.request.ReqBoardModifyDto;
-import com.spoton.spotonbackend.board.dto.request.ReqBoardSearchDto;
+import com.spoton.spotonbackend.board.dto.request.ReqBoardReportDto;
 import com.spoton.spotonbackend.board.dto.response.ResBoardDto;
 import com.spoton.spotonbackend.board.entity.Board;
 import com.spoton.spotonbackend.board.entity.BoardLike;
+import com.spoton.spotonbackend.board.entity.BoardReport;
 import com.spoton.spotonbackend.board.repository.BoardLikeRepository;
+import com.spoton.spotonbackend.board.repository.BoardReportRepository;
 import com.spoton.spotonbackend.board.repository.BoardRepository;
+import com.spoton.spotonbackend.common.auth.EmailProvider;
 import com.spoton.spotonbackend.common.auth.TokenUserInfo;
+import com.spoton.spotonbackend.common.dto.CommonErrorDto;
 import com.spoton.spotonbackend.user.entity.User;
 import com.spoton.spotonbackend.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -18,6 +22,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,10 +36,13 @@ import static com.spoton.spotonbackend.board.entity.QBoard.*;
 @Transactional
 public class BoardService {
 
-    private final JPAQueryFactory queryFactory;
     private final BoardRepository boardRepository;
     private final UserRepository userRepository;
     private final BoardLikeRepository boardLikeRepository;
+    private final BoardReportRepository boardReportRepository;
+
+    private final JPAQueryFactory queryFactory;
+    private final EmailProvider emailProvider;
 
     public Board create(ReqBoardCreateDto dto, TokenUserInfo userInfo) {
 
@@ -47,16 +56,18 @@ public class BoardService {
         return boardRepository.save(board);
     }
 
-    public Page<ResBoardDto> list(ReqBoardSearchDto dto, Pageable pageable) {
+    public Page<ResBoardDto> list(String searchType,
+                                  String searchKeyword,
+                                  Pageable pageable) {
 
         BooleanBuilder builder = new BooleanBuilder();
 
         // 쿼리 조각 만들기
-        if (dto.getSearchKeyword() != null) {
-            switch (dto.getSearchType()) {
-                case "writer" -> builder.and(board.user.nickname.like("%" + dto.getSearchKeyword() + "%"));
-                case "subject" -> builder.and(board.subject.like("%" + dto.getSearchKeyword() + "%"));
-                case "content" -> builder.and(board.content.like("%" + dto.getSearchKeyword() + "%"));
+        if (searchKeyword != null) {
+            switch (searchType) {
+                case "writer" -> builder.and(board.user.nickname.like("%" + searchKeyword + "%"));
+                case "subject" -> builder.and(board.subject.like("%" + searchKeyword + "%"));
+                case "content" -> builder.and(board.content.like("%" + searchKeyword + "%"));
             }
         }
 
@@ -64,6 +75,7 @@ public class BoardService {
         List<Board> rawBoards = queryFactory
                 .selectFrom(board)
                 .where(builder)
+                .orderBy(board.createTime.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -105,7 +117,7 @@ public class BoardService {
 
         board.setSubject(dto.getSubject());
         board.setContent(dto.getContent());
-        board.setLeagueId(dto.getLeagueId());
+        board.setSports(dto.getSports());
 
         return board;
     }
@@ -127,18 +139,34 @@ public class BoardService {
         boardRepository.delete(board);
     }
 
-    public Board increaseReportCount(Long boardId) {
+    public String sendReport(ReqBoardReportDto dto, TokenUserInfo userInfo) {
 
-        Board board = boardRepository.findById(boardId).orElseThrow(
+        Board board = boardRepository.findById(dto.getBoardId()).orElseThrow(
                 () -> new EntityNotFoundException("게시물을 찾을 수 없습니다.")
         );
 
-        Long reportCount = board.getReportCount();
-        reportCount += 1;
+        User user = userRepository.findByEmail(userInfo.getEmail()).orElseThrow(
+                () -> new EntityNotFoundException("회원 정보를 찾을 수 없습니다.")
+        );
 
-        board.setReportCount(reportCount);
+        if (!boardReportRepository.existsByUser_UserIdAndBoard_BoardId(user.getUserId(), dto.getBoardId())) {
 
-        return board;
+            // 관리자에게 신고 내역 보내기
+            String result = emailProvider.sendReportMail(dto.getBoardId(), dto.getReportContent(), userInfo, "게시물");
+            if (result.equals("fail")) {
+                return "email send fail";
+            }
+
+            BoardReport boardReport = new BoardReport();
+            boardReport.setBoard(board);
+            boardReport.setUser(user);
+
+            boardReportRepository.save(boardReport);
+            board.setReportCount(board.getReportCount() + 1);
+
+            return "success";
+        }
+        return "existed";
     }
 
     public Board increaseViewCount(Long boardId) {
@@ -155,7 +183,7 @@ public class BoardService {
         return board;
     }
 
-    public BoardLike addLikeCount(Long boardId, TokenUserInfo userInfo) {
+    public void LikeCount(Long boardId, TokenUserInfo userInfo) {
 
         User user = userRepository.findByEmail(userInfo.getEmail()).orElseThrow(
                 () -> new EntityNotFoundException("회원 정보를 찾을 수 없습니다.")
@@ -166,26 +194,19 @@ public class BoardService {
         );
 
         if (boardLikeRepository.existsByUser_UserIdAndBoard_BoardId(user.getUserId(), boardId)) {
-            throw new IllegalStateException("이미 좋아요를 한 유저입니다.");
+            BoardLike boardLike = boardLikeRepository.findByUser_UserIdAndBoard_BoardId(user.getUserId(), boardId).orElseThrow(
+                    () -> new EntityNotFoundException("좋아요 로그를 찾을 수 없습니다.")
+            );
+
+            boardLikeRepository.delete(boardLike);
+            board.setLikeCount(board.getLikeCount() - 1);
+        } else {
+            BoardLike boardLike = new BoardLike();
+            boardLike.setBoard(board);
+            boardLike.setUser(user);
+
+            boardLikeRepository.save(boardLike);
+            board.setLikeCount(board.getLikeCount() + 1);
         }
-
-        BoardLike boardLike = new BoardLike();
-        boardLike.setBoard(board);
-        boardLike.setUser(user);
-
-        return boardLikeRepository.save(boardLike);
-    }
-
-    public void cancelLikeCount(Long boardId, TokenUserInfo userInfo) {
-
-        User user = userRepository.findByEmail(userInfo.getEmail()).orElseThrow(
-                () -> new EntityNotFoundException("회원 정보를 찾을 수 없습니다.")
-        );
-
-        BoardLike boardLike = boardLikeRepository.findByUser_UserIdAndBoard_BoardId(user.getUserId(), boardId).orElseThrow(
-                () -> new EntityNotFoundException("좋아요 로그를 찾을 수 없습니다.")
-        );
-
-        boardLikeRepository.delete(boardLike);
     }
 }

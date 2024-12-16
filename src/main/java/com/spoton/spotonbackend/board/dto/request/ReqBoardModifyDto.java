@@ -13,5 +13,5 @@ public class ReqBoardModifyDto {
     private Long boardId;
     private String subject;
     private String content;
-    private int leagueId;
+    private String sports;
 }

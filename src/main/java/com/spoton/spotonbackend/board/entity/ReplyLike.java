@@ -17,14 +17,14 @@ public class ReplyLike {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long replyLikeId;
 
+    @Setter
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    @Setter
     private User user;
 
+    @Setter
     @ManyToOne
     @JoinColumn(name = "reply_id", nullable = false)
-    @Setter
     private Reply reply;
 
 }

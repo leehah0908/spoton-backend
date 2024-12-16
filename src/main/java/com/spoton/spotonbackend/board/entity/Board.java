@@ -6,6 +6,9 @@ import com.spoton.spotonbackend.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
@@ -28,7 +31,7 @@ public class Board extends BaseTimeEntity {
     private String content;
 
     @Setter
-    private int leagueId;
+    private String sports;
 
     @Builder.Default
     @Setter
@@ -42,22 +45,37 @@ public class Board extends BaseTimeEntity {
     @Setter
     private Long reportCount = 0L;
 
+    @Builder.Default
+    @Setter
+    private Long replyCount = 0L;
+
     @Setter
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Reply> replies = new ArrayList<>();
+
+    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<BoardLike> boardLikes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<BoardReport> boardReports = new ArrayList<>();
+
     public ResBoardDto toResBoardDto() {
         return ResBoardDto.builder()
                 .boardId(boardId)
+                .email(user.getEmail())
                 .subject(subject)
                 .content(content)
-                .leagueId(leagueId)
+                .sports(sports)
                 .viewCount(viewCount)
                 .likeCount(likeCount)
+                .replyCount(replyCount)
                 .nickname(user.getNickname())
-                .createTime(user.getCreateTime())
-                .updateTime(user.getUpdateTime())
+                .createTime(getCreateTime())
+                .updateTime(getUpdateTime())
                 .profile(user.getProfile())
                 .build();
     }

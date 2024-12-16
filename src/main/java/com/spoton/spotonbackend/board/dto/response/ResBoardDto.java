@@ -14,11 +14,13 @@ import java.time.LocalDateTime;
 public class ResBoardDto {
 
     private Long boardId;
+    private String email;
     private String subject;
     private String content;
-    private int leagueId;
+    private String sports;
     private Long viewCount;
     private Long likeCount;
+    private Long replyCount;
 
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
