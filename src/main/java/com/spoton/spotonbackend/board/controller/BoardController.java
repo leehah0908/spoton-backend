@@ -6,7 +6,6 @@ import com.spoton.spotonbackend.board.dto.request.ReqBoardReportDto;
 import com.spoton.spotonbackend.board.dto.response.ResBoardDto;
 import com.spoton.spotonbackend.board.entity.Board;
 import com.spoton.spotonbackend.board.service.BoardService;
-import com.spoton.spotonbackend.common.auth.EmailProvider;
 import com.spoton.spotonbackend.common.auth.TokenUserInfo;
 import com.spoton.spotonbackend.common.dto.CommonErrorDto;
 import com.spoton.spotonbackend.common.dto.CommonResDto;
@@ -88,7 +87,6 @@ public class BoardController {
     @PostMapping("/report")
     public ResponseEntity<?> sendBoardReport(@RequestBody ReqBoardReportDto dto,
                                              @AuthenticationPrincipal TokenUserInfo userInfo){
-
         // 신고 이메일 보내기
         String result = boardService.sendReport(dto, userInfo);
 
@@ -121,7 +119,7 @@ public class BoardController {
                                           @AuthenticationPrincipal TokenUserInfo userInfo){
 
         // 좋아요 처리
-        boardService.LikeCount(boardId, userInfo);
+        boardService.likeCount(boardId, userInfo);
 
         CommonResDto resDto = new CommonResDto(HttpStatus.OK, "좋아요 처리 성공", true);
         return new ResponseEntity<>(resDto, HttpStatus.OK);

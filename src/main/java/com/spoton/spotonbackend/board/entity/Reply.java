@@ -27,6 +27,7 @@ public class Reply extends BaseTimeEntity {
     private String content;
 
     @Builder.Default
+    @Setter
     private Long likeCount = 0L;
 
     @Builder.Default
@@ -52,10 +53,11 @@ public class Reply extends BaseTimeEntity {
     public ResReplyDto toResReplyDto() {
         return ResReplyDto.builder()
                 .replyId(replyId)
+                .email(user.getEmail())
                 .content(content)
                 .likeCount(likeCount)
-                .createTime(user.getCreateTime())
-                .updateTime(user.getUpdateTime())
+                .createTime(getCreateTime())
+                .updateTime(getUpdateTime())
                 .nickname(user.getNickname())
                 .profile(user.getProfile())
                 .build();

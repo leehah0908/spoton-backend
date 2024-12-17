@@ -3,11 +3,14 @@ package com.spoton.spotonbackend.board.service;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.spoton.spotonbackend.board.dto.request.ReqReplyCreateDto;
 import com.spoton.spotonbackend.board.dto.request.ReqReplyModifyDto;
+import com.spoton.spotonbackend.board.dto.request.ReqReplyReportDto;
 import com.spoton.spotonbackend.board.dto.response.ResReplyDto;
 import com.spoton.spotonbackend.board.entity.*;
 import com.spoton.spotonbackend.board.repository.BoardRepository;
 import com.spoton.spotonbackend.board.repository.ReplyLikeRepository;
+import com.spoton.spotonbackend.board.repository.ReplyReportRepository;
 import com.spoton.spotonbackend.board.repository.ReplyRepository;
+import com.spoton.spotonbackend.common.auth.EmailProvider;
 import com.spoton.spotonbackend.common.auth.TokenUserInfo;
 import com.spoton.spotonbackend.user.entity.User;
 import com.spoton.spotonbackend.user.repository.UserRepository;
@@ -30,11 +33,14 @@ import static com.spoton.spotonbackend.board.entity.QReply.reply;
 @Transactional
 public class ReplyService {
 
-    private final JPAQueryFactory queryFactory;
     private final ReplyRepository replyRepository;
     private final UserRepository userRepository;
     private final BoardRepository boardRepository;
     private final ReplyLikeRepository replyLikeRepository;
+    private final ReplyReportRepository replyReportRepository;
+
+    private final JPAQueryFactory queryFactory;
+    private final EmailProvider emailProvider;
 
     public Page<ResReplyDto> list(Long boardId, Pageable pageable) {
 
@@ -70,6 +76,8 @@ public class ReplyService {
         reply.setUser(user);
         reply.setBoard(board);
 
+        board.setReplyCount(board.getReplyCount() + 1);
+
         return replyRepository.save(reply);
     }
 
@@ -91,7 +99,7 @@ public class ReplyService {
         return reply;
     }
 
-    public void delete(Long replyId, TokenUserInfo userInfo) {
+    public void delete(Long replyId, Long boardId, TokenUserInfo userInfo) {
         Reply reply = replyRepository.findById(replyId).orElseThrow(
                 () -> new EntityNotFoundException("댓글을 찾을 수 없습니다.")
         );
@@ -100,27 +108,49 @@ public class ReplyService {
                 () -> new EntityNotFoundException("작성자 정보를 찾을 수 없습니다.")
         );
 
+        Board board = boardRepository.findById(boardId).orElseThrow(
+                () -> new EntityNotFoundException("게시물을 찾을 수 없습니다.")
+        );
+
         if (!reply.getUser().getUserId().equals(user.getUserId())) {
             throw new IllegalArgumentException("삭제 권한이 없습니다.");
         }
 
         replyRepository.delete(reply);
+        board.setReplyCount(board.getReplyCount() - 1);
     }
 
-    public Reply increaseReportCount(Long replyId) {
-        Reply reply = replyRepository.findById(replyId).orElseThrow(
+    public String sendReport(ReqReplyReportDto dto, TokenUserInfo userInfo) {
+
+        Reply reply = replyRepository.findById(dto.getReplyId()).orElseThrow(
                 () -> new EntityNotFoundException("댓글을 찾을 수 없습니다.")
         );
 
-        Long reportCount = reply.getReportCount();
-        reportCount += 1;
+        User user = userRepository.findByEmail(userInfo.getEmail()).orElseThrow(
+                () -> new EntityNotFoundException("회원 정보를 찾을 수 없습니다.")
+        );
 
-        reply.setReportCount(reportCount);
+        if(!replyReportRepository.existsByUser_UserIdAndReply_ReplyId(user.getUserId(), dto.getReplyId())){
 
-        return reply;
+            // 관리자에게 신고 내역 보내기
+            String result = emailProvider.sendReportMail(dto.getReplyId(), dto.getReportContent(), userInfo, "댓글");
+            if (result.equals("fail")) {
+                return "email send fail";
+            }
+
+            ReplyReport replyReport = new ReplyReport();
+            replyReport.setUser(user);
+            replyReport.setReply(reply);
+
+            replyReportRepository.save(replyReport);
+            reply.setReportCount(reply.getReportCount() + 1);
+
+            return "success";
+        }
+        return "existed";
     }
 
-    public ReplyLike addLikeCount(Long replyId, TokenUserInfo userInfo) {
+    public void likeCount(Long replyId, TokenUserInfo userInfo) {
 
         User user = userRepository.findByEmail(userInfo.getEmail()).orElseThrow(
                 () -> new EntityNotFoundException("회원 정보를 찾을 수 없습니다.")
@@ -131,25 +161,19 @@ public class ReplyService {
         );
 
         if (replyLikeRepository.existsByUser_UserIdAndReply_ReplyId(user.getUserId(), replyId)) {
-            throw new IllegalStateException("이미 좋아요를 한 유저입니다.");
+            ReplyLike replyLike = replyLikeRepository.findByUser_UserIdAndReply_ReplyId(user.getUserId(), replyId).orElseThrow(
+                    () -> new EntityNotFoundException("좋아요 로그를 찾을 수 없습니다.")
+            );
+
+            replyLikeRepository.delete(replyLike);
+            reply.setLikeCount(reply.getLikeCount() - 1);
+        } else {
+            ReplyLike replyLike = new ReplyLike();
+            replyLike.setReply(reply);
+            replyLike.setUser(user);
+
+            replyLikeRepository.save(replyLike);
+            reply.setLikeCount(reply.getLikeCount() + 1);
         }
-
-        ReplyLike replyLike = new ReplyLike();
-        replyLike.setReply(reply);
-        replyLike.setUser(user);
-
-        return replyLikeRepository.save(replyLike);
-    }
-
-    public void cancelLikeCount(Long replyId, TokenUserInfo userInfo) {
-        User user = userRepository.findByEmail(userInfo.getEmail()).orElseThrow(
-                () -> new EntityNotFoundException("회원 정보를 찾을 수 없습니다.")
-        );
-
-        ReplyLike replyLike = replyLikeRepository.findByUser_UserIdAndReply_ReplyId(user.getUserId(), replyId).orElseThrow(
-                () -> new EntityNotFoundException("좋아요 로그를 찾을 수 없습니다.")
-        );
-
-        replyLikeRepository.delete(replyLike);
     }
 }

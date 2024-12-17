@@ -64,9 +64,10 @@ public class ReplyController {
     // 댓글 삭제
     @PostMapping("/delete")
     public ResponseEntity<?> replyDelete(@RequestParam Long replyId,
+                                         @RequestParam Long boardId,
                                          @AuthenticationPrincipal TokenUserInfo userInfo) {
 
-        replyService.delete(replyId, userInfo);
+        replyService.delete(replyId, boardId, userInfo);
 
         CommonResDto resDto = new CommonResDto(HttpStatus.OK, "댓글 삭제 완료", true);
         return new ResponseEntity<>(resDto, HttpStatus.OK);
@@ -76,41 +77,31 @@ public class ReplyController {
     @PostMapping("/report")
     public ResponseEntity<?> sendReplyReport(@RequestBody ReqReplyReportDto dto,
                                              @AuthenticationPrincipal TokenUserInfo userInfo) {
+        System.out.println(dto);
+        // 신고 이메일 보내기
+        String result = replyService.sendReport(dto, userInfo);
 
-        String result = emailProvider.sendReportMail(dto.getReplyId(), dto.getReportContent(), userInfo, "댓글");
-        if (result.equals("fail")) {
-            CommonErrorDto errorDto = new CommonErrorDto(HttpStatus.SERVICE_UNAVAILABLE, "신고 실패, 다시 확인해주세요.");
+        if (result.equals("email send fail")) {
+            CommonErrorDto errorDto = new CommonErrorDto(HttpStatus.SERVICE_UNAVAILABLE, "신고 실패, 다시 시도해주세요.");
+            return new ResponseEntity<>(errorDto, HttpStatus.SERVICE_UNAVAILABLE);
+        } else if (result.equals("existed")) {
+            CommonErrorDto errorDto = new CommonErrorDto(HttpStatus.SERVICE_UNAVAILABLE, "이미 신고한 게시물입니다.");
             return new ResponseEntity<>(errorDto, HttpStatus.SERVICE_UNAVAILABLE);
         }
 
-        // 신고 카운트 증가
-        Reply reply = replyService.increaseReportCount(dto.getReplyId());
-
-        CommonResDto resDto = new CommonResDto(HttpStatus.OK, "댓글 신고 성공", reply.getReplyId());
+        CommonResDto resDto = new CommonResDto(HttpStatus.OK, "댓글이 신고되었습니다.", result);
         return new ResponseEntity<>(resDto, HttpStatus.OK);
     }
 
-    // 좋아요 추가
-    @PostMapping("/like_add")
+    // 좋아요 처리
+    @PostMapping("/like")
     public ResponseEntity<?> addLikeCount(@RequestParam Long replyId,
                                           @AuthenticationPrincipal TokenUserInfo userInfo) {
 
-        // 좋아요 증가
-        ReplyLike replyLike = replyService.addLikeCount(replyId, userInfo);
+        // 좋아요 처리
+        replyService.likeCount(replyId, userInfo);
 
-        CommonResDto resDto = new CommonResDto(HttpStatus.OK, "좋아요 추가 성공", replyLike);
-        return new ResponseEntity<>(resDto, HttpStatus.OK);
-    }
-
-    // 좋아요 삭제
-    @PostMapping("/list_calcel")
-    public ResponseEntity<?> cancelLikeCount(@RequestParam Long replyId,
-                                             @AuthenticationPrincipal TokenUserInfo userInfo) {
-
-        // 좋아요 삭제
-        replyService.cancelLikeCount(replyId, userInfo);
-
-        CommonResDto resDto = new CommonResDto(HttpStatus.OK, "좋아요 삭제 성공", true);
+        CommonResDto resDto = new CommonResDto(HttpStatus.OK, "좋아요 처리 성공", true);
         return new ResponseEntity<>(resDto, HttpStatus.OK);
     }
 }

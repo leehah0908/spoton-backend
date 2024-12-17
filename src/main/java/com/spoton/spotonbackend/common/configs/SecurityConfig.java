@@ -49,6 +49,7 @@ public class SecurityConfig {
                                     "/board/list",
                                     "/board/detail",
                                     "/board/view",
+                                    "/reply/list",
                                     "/game/list",
                                     "/user/refresh"
                             )

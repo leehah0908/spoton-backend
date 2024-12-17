@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 public class ResReplyDto {
 
     private Long replyId;
+    private String email;
     private String content;
     private Long likeCount;
 
