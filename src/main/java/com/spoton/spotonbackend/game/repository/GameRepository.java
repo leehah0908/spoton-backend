@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Repository
 public class GameRepository {
@@ -77,5 +78,39 @@ public class GameRepository {
 
         String sql = String.format("SELECT * FROM %s WHERE DATE_FORMAT(gameDateTime, '%%Y-%%m') = ?", leagueTableName);
         return jdbcTemplate.queryForList(sql, yearMonth);
+    }
+
+    public Map<String, Object> findGameId(String league, String gameId) {
+
+        String leagueTableName = switch (league) {
+            case "kbo" -> "kbo_game_data";
+            case "mlb" -> "mlb_game_data";
+            case "kleague" -> "kleague1_game_data";
+            case "epl" -> "epl_game_data";
+            case "kbl" -> "kbl_game_data";
+            case "nba" -> "nba_game_data";
+            case "kovo" -> "kovo_game_data";
+            case "wkovw" -> "wkovo_game_data";
+            case "lck" -> "lck_game_data";
+            default -> throw new IllegalArgumentException("알 수 없는 리그: " + league);
+        };
+
+        String sql = String.format("SELECT * FROM %s WHERE gameId = ?", leagueTableName);
+        return jdbcTemplate.queryForMap(sql, gameId);
+    }
+
+    public List<Map<String, Object>> todayGame(String today) {
+
+        List<String> leagues = LEAGUE_TEAM_MAP.values().stream()
+                .flatMap(map -> map.values().stream())
+                .toList();
+
+        List<Map<String, Object>> allResults = new ArrayList<>();
+
+        for (String tableName : leagues) {
+            String sql = String.format("SELECT * FROM %s WHERE DATE(gameDateTime) = ?", tableName);
+            allResults.addAll(jdbcTemplate.queryForList(sql, today));
+        }
+        return allResults;
     }
 }

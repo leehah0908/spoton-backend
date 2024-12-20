@@ -9,6 +9,7 @@ import com.spoton.spotonbackend.board.service.BoardService;
 import com.spoton.spotonbackend.common.auth.TokenUserInfo;
 import com.spoton.spotonbackend.common.dto.CommonErrorDto;
 import com.spoton.spotonbackend.common.dto.CommonResDto;
+import com.spoton.spotonbackend.game.dto.response.ResGameDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -17,6 +18,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/board")
@@ -122,6 +125,20 @@ public class BoardController {
         boardService.likeCount(boardId, userInfo);
 
         CommonResDto resDto = new CommonResDto(HttpStatus.OK, "좋아요 처리 성공", true);
+        return new ResponseEntity<>(resDto, HttpStatus.OK);
+    }
+
+    @GetMapping("/hot_board")
+    public ResponseEntity<?> hotBoard(){
+
+        System.out.println("들어왓따다담나망ㅁㅇ");
+
+        List<ResBoardDto> hotBoardList = boardService.hotBoard();
+        System.out.println(hotBoardList);
+        System.out.println(hotBoardList.size());
+        System.out.println("????");
+
+        CommonResDto resDto = new CommonResDto(HttpStatus.OK, "베스트 게시물 조회 완료", hotBoardList);
         return new ResponseEntity<>(resDto, HttpStatus.OK);
     }
 }

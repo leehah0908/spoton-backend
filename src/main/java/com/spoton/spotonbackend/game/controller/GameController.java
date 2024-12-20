@@ -14,6 +14,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/game")
@@ -33,14 +34,15 @@ public class GameController {
         return new ResponseEntity<>(resDto, HttpStatus.OK);
     }
 
-//    @GetMapping("/detail")
-//    public ResponseEntity<?> gameDetail(@RequestParam Long gameId){
-//
-//        ResGameDetailDto gameDetail = gameService.detail(gameId);
-//
-//        CommonResDto resDto = new CommonResDto(HttpStatus.OK, "경기 상세 정보 완료", gameDetail);
-//        return new ResponseEntity<>(resDto, HttpStatus.OK);
-//    }
+    @GetMapping("/detail")
+    public ResponseEntity<?> gameDetail(@RequestParam String league,
+                                        @RequestParam String gameId){
+
+        Map<String, Object> gameDetail= gameService.detail(league, gameId);
+
+        CommonResDto resDto = new CommonResDto(HttpStatus.OK, "경기 상세 정보 완료", gameDetail);
+        return new ResponseEntity<>(resDto, HttpStatus.OK);
+    }
 
     @GetMapping("/myteam")
     public ResponseEntity<?> myTeamLoad(@AuthenticationPrincipal TokenUserInfo userInfo){
@@ -49,6 +51,15 @@ public class GameController {
         MyTeam myTeam = gameService.myTeamLoad(userInfo);
 
         CommonResDto resDto = new CommonResDto(HttpStatus.OK, "마이팀 정보 조회 완료", myTeam);
+        return new ResponseEntity<>(resDto, HttpStatus.OK);
+    }
+
+    @GetMapping("/today")
+    public ResponseEntity<?> todayGame(){
+
+        List<ResGameDto> todayGameList = gameService.today();
+
+        CommonResDto resDto = new CommonResDto(HttpStatus.OK, "오늘 경기 조회 완료", todayGameList);
         return new ResponseEntity<>(resDto, HttpStatus.OK);
     }
 }

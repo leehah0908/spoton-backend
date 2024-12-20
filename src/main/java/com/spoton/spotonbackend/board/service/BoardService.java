@@ -15,6 +15,7 @@ import com.spoton.spotonbackend.board.repository.BoardRepository;
 import com.spoton.spotonbackend.common.auth.EmailProvider;
 import com.spoton.spotonbackend.common.auth.TokenUserInfo;
 import com.spoton.spotonbackend.common.dto.CommonErrorDto;
+import com.spoton.spotonbackend.game.dto.response.ResGameDto;
 import com.spoton.spotonbackend.user.entity.User;
 import com.spoton.spotonbackend.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -27,7 +28,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.spoton.spotonbackend.board.entity.QBoard.*;
 
@@ -208,5 +213,13 @@ public class BoardService {
             boardLikeRepository.save(boardLike);
             board.setLikeCount(board.getLikeCount() + 1);
         }
+    }
+
+    public List<ResBoardDto> hotBoard() {
+
+        List<Board> hotBoards = boardRepository.findTop10ByOrderByLikeCountDesc();
+
+        return hotBoards.stream().map(Board::toResBoardDto).collect(Collectors.toList());
+
     }
 }

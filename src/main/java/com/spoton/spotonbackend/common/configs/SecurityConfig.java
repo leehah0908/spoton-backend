@@ -49,8 +49,11 @@ public class SecurityConfig {
                                     "/board/list",
                                     "/board/detail",
                                     "/board/view",
+                                    "/board/hot_board",
                                     "/reply/list",
                                     "/game/list",
+                                    "/game/detail",
+                                    "/game/today",
                                     "/user/refresh"
                             )
                             .permitAll()

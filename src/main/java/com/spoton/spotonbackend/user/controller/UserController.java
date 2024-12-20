@@ -113,10 +113,9 @@ public class UserController {
     // 이메일 중복 확인
     @GetMapping("/check_email")
     public ResponseEntity<?> checkEmail(@RequestParam String email){
-        System.out.println(email);
 
         boolean checkEmail = userService.checkEmail(email);
-        System.out.println("체크 결과: " + checkEmail);
+
         CommonResDto resDto = new CommonResDto(HttpStatus.OK, "사용가능한 이메일입니다.", checkEmail);
         return new ResponseEntity<>(resDto, HttpStatus.OK);
     }
@@ -207,8 +206,6 @@ public class UserController {
     @PostMapping("/change_pw")
     public ResponseEntity<?> changePassword(@RequestBody ReqPasswordChangeDto dto,
                                             @AuthenticationPrincipal TokenUserInfo userInfo) {
-        System.out.println(dto.getOldPassword());
-        System.out.println(dto.getNewPassword());
 
         User user = userService.checkPassword(userInfo.getEmail(), dto.getOldPassword());
 
@@ -275,7 +272,6 @@ public class UserController {
     public ResponseEntity<?> refreshToken(@CookieValue("userId") String userId,
                                           HttpServletResponse response) {
 
-        System.out.println("받아왔다??" + userId);
         User user = userService.findById(Long.valueOf(userId));
 
         Object refreshToken = redisTemplate.opsForValue().get(user.getEmail());
