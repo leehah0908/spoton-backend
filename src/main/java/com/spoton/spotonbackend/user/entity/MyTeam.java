@@ -18,23 +18,23 @@ public class MyTeam {
     private Long mtId;
 
     @Setter
-    private String kboTeam;
+    private String kbo;
     @Setter
-    private String mlbTeam;
+    private String mlb;
     @Setter
-    private String kleagueTeam;
+    private String kleague;
     @Setter
-    private String eplTeam;
+    private String epl;
     @Setter
-    private String kblTeam;
+    private String kbl;
     @Setter
-    private String nbaTeam;
+    private String nba;
     @Setter
-    private String kovoTeam;
+    private String kovo;
     @Setter
-    private String wkovwTeam;
+    private String wkovo;
     @Setter
-    private String lckTeam;
+    private String lck;
 
     // User와의 OneToOne 관계 설정
     @OneToOne(fetch = FetchType.LAZY)

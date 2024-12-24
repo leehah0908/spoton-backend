@@ -134,15 +134,15 @@ public class UserService {
             user.setNickname(dto.getNickname());
         } else if (dto.getType().equals("myTeam")) {
             MyTeam myTeam = user.getMyTeam();
-            myTeam.setKboTeam(dto.getMyTeam().getKboTeam());
-            myTeam.setMlbTeam(dto.getMyTeam().getMlbTeam());
-            myTeam.setKleagueTeam(dto.getMyTeam().getKleagueTeam());
-            myTeam.setEplTeam(dto.getMyTeam().getEplTeam());
-            myTeam.setKblTeam(dto.getMyTeam().getKblTeam());
-            myTeam.setNbaTeam(dto.getMyTeam().getNbaTeam());
-            myTeam.setKovoTeam(dto.getMyTeam().getKovoTeam());
-            myTeam.setWkovwTeam(dto.getMyTeam().getWkovwTeam());
-            myTeam.setLckTeam(dto.getMyTeam().getLckTeam());
+            myTeam.setKbo(dto.getMyTeam().getKbo());
+            myTeam.setMlb(dto.getMyTeam().getMlb());
+            myTeam.setKleague(dto.getMyTeam().getKleague());
+            myTeam.setEpl(dto.getMyTeam().getEpl());
+            myTeam.setKbl(dto.getMyTeam().getKbl());
+            myTeam.setNba(dto.getMyTeam().getNba());
+            myTeam.setKovo(dto.getMyTeam().getKovo());
+            myTeam.setWkovo(dto.getMyTeam().getWkovo());
+            myTeam.setLck(dto.getMyTeam().getLck());
         }
         return user;
     }
