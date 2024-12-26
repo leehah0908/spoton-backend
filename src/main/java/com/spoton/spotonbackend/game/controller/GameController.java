@@ -1,11 +1,15 @@
 package com.spoton.spotonbackend.game.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spoton.spotonbackend.common.auth.TokenUserInfo;
+import com.spoton.spotonbackend.common.configs.JsonConfig;
 import com.spoton.spotonbackend.common.dto.CommonResDto;
 import com.spoton.spotonbackend.game.dto.request.ReqGameListDto;
 import com.spoton.spotonbackend.game.service.GameService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -13,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/game")
@@ -21,6 +26,7 @@ import java.util.Map;
 public class GameController {
 
     private final GameService gameService;
+    private final RedisTemplate<String, String> gameCacheTemplate;
 
     @GetMapping("/list")
     public ResponseEntity<?> gameList(ReqGameListDto dto){
@@ -31,8 +37,25 @@ public class GameController {
     }
 
     @GetMapping("/detail")
-    public ResponseEntity<?> gameDetail(@RequestParam String gameId){
+    public ResponseEntity<?> gameDetail(@RequestParam String gameId) {
+        String cacheData = gameCacheTemplate.opsForValue().get(gameId);
+
+        if (cacheData != null) {
+            Map<String, Object> gameDetail = JsonConfig.stringToMap(cacheData);
+            System.out.println("캐싱으로 나감");
+
+            CommonResDto resDto = new CommonResDto(HttpStatus.OK, "경기 상세 정보 완료", gameDetail);
+            return new ResponseEntity<>(resDto, HttpStatus.OK);
+        }
+
         Map<String, Object> gameDetail = gameService.detail(gameId);
+        System.out.println("직접 조회");
+
+        // game Data redis에 저장
+        String gameDetailStr = JsonConfig.mapToString(gameDetail);
+
+        gameCacheTemplate.opsForValue().set(gameId, gameDetailStr, 7, TimeUnit.DAYS);
+        System.out.println("캐싱저장 완료");
 
         CommonResDto resDto = new CommonResDto(HttpStatus.OK, "경기 상세 정보 완료", gameDetail);
         return new ResponseEntity<>(resDto, HttpStatus.OK);

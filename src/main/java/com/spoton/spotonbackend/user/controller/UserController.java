@@ -306,8 +306,6 @@ public class UserController {
         return new ResponseEntity<>(resDto, HttpStatus.OK);
     }
 
-
-
     // 회원 탈퇴
     @PostMapping("/withdraw")
     public ResponseEntity<?> withdraw(@AuthenticationPrincipal TokenUserInfo userInfo){

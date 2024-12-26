@@ -1,5 +1,8 @@
 package com.spoton.spotonbackend.common.configs;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -27,7 +30,6 @@ public class RedisConfig {
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration(redisHost, redisPort);
         redisStandaloneConfiguration.setDatabase(0);
         return new LettuceConnectionFactory(redisStandaloneConfiguration);
-
     }
 
     // 이메일 인증 (이메일 - 인증번호)
@@ -37,16 +39,15 @@ public class RedisConfig {
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration(redisHost, redisPort);
         redisStandaloneConfiguration.setDatabase(1);
         return new LettuceConnectionFactory(redisStandaloneConfiguration);
-
     }
 
+    // game detail 데이터 캐싱
     @Bean
-    @Qualifier("baseball-game-db")
-    public RedisConnectionFactory baseballGameFactory() {
+    @Qualifier("game-cache-db")
+    public RedisConnectionFactory gameCacheFactory() {
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration(redisHost, redisPort);
-        redisStandaloneConfiguration.setDatabase(1);
+        redisStandaloneConfiguration.setDatabase(2);
         return new LettuceConnectionFactory(redisStandaloneConfiguration);
-
     }
 
     // ======================================================== 템플릿 ========================================================
@@ -66,6 +67,23 @@ public class RedisConfig {
     public RedisTemplate<String, Integer> emailCertificationTemplate(@Qualifier("email-certification-db") RedisConnectionFactory factory) {
         RedisTemplate<String, Integer> template = new RedisTemplate<>();
         template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+        template.setConnectionFactory(factory);
+
+        return template;
+    }
+
+    @Bean
+    @Qualifier("gameCacheTemplate")
+    public RedisTemplate<String, String> gameCacheTemplate(@Qualifier("game-cache-db") RedisConnectionFactory factory) {
+        RedisTemplate<String, String> template = new RedisTemplate<>();
+        template.setKeySerializer(new StringRedisSerializer());
+
+        // ObjectMapper 설정
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false); // ISO-8601 포맷
+
         template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
         template.setConnectionFactory(factory);
 
