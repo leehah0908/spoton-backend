@@ -23,6 +23,7 @@ public class ResNanumDto {
     private Long viewCount;
     private Long likeCount;
     private Long chatCount;
+    private String status;
 
     private LocalDateTime createTime;
     private LocalDateTime updateTime;

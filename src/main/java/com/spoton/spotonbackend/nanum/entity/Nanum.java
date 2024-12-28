@@ -61,6 +61,10 @@ public class Nanum extends BaseTimeEntity {
     @Setter
     private Long chatCount = 0L;
 
+    @Builder.Default
+    @Setter
+    private String status = "나눔중";
+
     @Setter
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
@@ -89,6 +93,7 @@ public class Nanum extends BaseTimeEntity {
                 .nickname(user.getNickname())
                 .profile(user.getProfile())
                 .email(user.getEmail())
+                .status(status)
                 .build();
     }
 }

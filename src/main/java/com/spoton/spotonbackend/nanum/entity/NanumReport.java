@@ -16,7 +16,7 @@ public class NanumReport {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long boardReportId;
+    private Long nanumReportId;
 
     @Setter
     @ManyToOne
