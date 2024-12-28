@@ -9,7 +9,6 @@ import com.spoton.spotonbackend.board.service.BoardService;
 import com.spoton.spotonbackend.common.auth.TokenUserInfo;
 import com.spoton.spotonbackend.common.dto.CommonErrorDto;
 import com.spoton.spotonbackend.common.dto.CommonResDto;
-import com.spoton.spotonbackend.game.dto.response.ResGameDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -34,9 +33,6 @@ public class BoardController {
     public ResponseEntity<?> boardList(@RequestParam String searchType,
                                        @RequestParam String searchKeyword,
                                        Pageable pageable){
-
-        System.out.println(searchType);
-        System.out.println(searchKeyword);
         Page<ResBoardDto> boards = boardService.list(searchType, searchKeyword, pageable);
 
         CommonResDto resDto = new CommonResDto(HttpStatus.OK, "게시글 조회 완료", boards);
@@ -47,7 +43,6 @@ public class BoardController {
     @PostMapping("/create")
     public ResponseEntity<?> boardCreate(@RequestBody ReqBoardCreateDto dto,
                                          @AuthenticationPrincipal TokenUserInfo userInfo){
-
         Board board = boardService.create(dto, userInfo);
 
         CommonResDto resDto = new CommonResDto(HttpStatus.CREATED, "게시글 등록 완료", board.getBoardId());
@@ -58,7 +53,6 @@ public class BoardController {
     @PatchMapping("/modify")
     public ResponseEntity<?> boardModify(@RequestBody ReqBoardModifyDto dto,
                                          @AuthenticationPrincipal TokenUserInfo userInfo){
-
         Board board = boardService.modify(dto, userInfo);
 
         CommonResDto resDto = new CommonResDto(HttpStatus.OK, "게시글 수정 완료", board.getBoardId());
@@ -69,7 +63,6 @@ public class BoardController {
     @PostMapping("/delete")
     public ResponseEntity<?> boardDelete(@RequestParam Long boardId,
                                          @AuthenticationPrincipal TokenUserInfo userInfo){
-
         boardService.delete(boardId, userInfo);
 
         CommonResDto resDto = new CommonResDto(HttpStatus.OK, "게시글 삭제 완료", true);
@@ -79,7 +72,6 @@ public class BoardController {
     // 게시물 상세 조회
     @GetMapping("/detail")
     public ResponseEntity<?> boardDetail(@RequestParam Long boardId){
-
         ResBoardDto board = boardService.boardDetail(boardId);
 
         CommonResDto resDto = new CommonResDto(HttpStatus.OK, "게시글 상세 조회 완료", board);
@@ -108,7 +100,6 @@ public class BoardController {
     // 조회수 증가
     @PostMapping("/view")
     public ResponseEntity<?> increaseViewCount(@RequestParam Long boardId){
-
         // 조회수 카운트 증가
         Board board = boardService.increaseViewCount(boardId);
 
@@ -120,7 +111,6 @@ public class BoardController {
     @PostMapping("/like")
     public ResponseEntity<?> addLikeCount(@RequestParam Long boardId,
                                           @AuthenticationPrincipal TokenUserInfo userInfo){
-
         // 좋아요 처리
         boardService.likeCount(boardId, userInfo);
 
@@ -130,13 +120,7 @@ public class BoardController {
 
     @GetMapping("/hot_board")
     public ResponseEntity<?> hotBoard(){
-
-        System.out.println("들어왓따다담나망ㅁㅇ");
-
         List<ResBoardDto> hotBoardList = boardService.hotBoard();
-        System.out.println(hotBoardList);
-        System.out.println(hotBoardList.size());
-        System.out.println("????");
 
         CommonResDto resDto = new CommonResDto(HttpStatus.OK, "베스트 게시물 조회 완료", hotBoardList);
         return new ResponseEntity<>(resDto, HttpStatus.OK);

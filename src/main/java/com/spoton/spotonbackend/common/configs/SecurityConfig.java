@@ -46,6 +46,7 @@ public class SecurityConfig {
                                     "/user/pw_send",
                                     "/user/check_email",
                                     "/user/check_nickname",
+                                    "/user/refresh",
                                     "/board/list",
                                     "/board/detail",
                                     "/board/view",
@@ -54,7 +55,10 @@ public class SecurityConfig {
                                     "/game/list",
                                     "/game/detail",
                                     "/game/today",
-                                    "/user/refresh"
+                                    "/nanum/list",
+                                    "/nanum/detail",
+                                    "/nanum/lastest_nanum",
+                                    "/nanum/view"
                             )
                             .permitAll()
                             .anyRequest()

@@ -189,7 +189,6 @@ public class BoardService {
     }
 
     public void likeCount(Long boardId, TokenUserInfo userInfo) {
-
         User user = userRepository.findByEmail(userInfo.getEmail()).orElseThrow(
                 () -> new EntityNotFoundException("회원 정보를 찾을 수 없습니다.")
         );

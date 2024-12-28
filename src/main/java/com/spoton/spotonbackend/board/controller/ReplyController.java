@@ -85,7 +85,7 @@ public class ReplyController {
             CommonErrorDto errorDto = new CommonErrorDto(HttpStatus.SERVICE_UNAVAILABLE, "신고 실패, 다시 시도해주세요.");
             return new ResponseEntity<>(errorDto, HttpStatus.SERVICE_UNAVAILABLE);
         } else if (result.equals("existed")) {
-            CommonErrorDto errorDto = new CommonErrorDto(HttpStatus.SERVICE_UNAVAILABLE, "이미 신고한 게시물입니다.");
+            CommonErrorDto errorDto = new CommonErrorDto(HttpStatus.SERVICE_UNAVAILABLE, "이미 신고한 댓글입니다.");
             return new ResponseEntity<>(errorDto, HttpStatus.SERVICE_UNAVAILABLE);
         }
 
