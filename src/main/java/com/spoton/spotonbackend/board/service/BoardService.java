@@ -14,8 +14,6 @@ import com.spoton.spotonbackend.board.repository.BoardReportRepository;
 import com.spoton.spotonbackend.board.repository.BoardRepository;
 import com.spoton.spotonbackend.common.auth.EmailProvider;
 import com.spoton.spotonbackend.common.auth.TokenUserInfo;
-import com.spoton.spotonbackend.common.dto.CommonErrorDto;
-import com.spoton.spotonbackend.game.dto.response.ResGameDto;
 import com.spoton.spotonbackend.user.entity.User;
 import com.spoton.spotonbackend.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -23,15 +21,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.spoton.spotonbackend.board.entity.QBoard.*;
@@ -219,6 +212,14 @@ public class BoardService {
         List<Board> hotBoards = boardRepository.findTop10ByOrderByLikeCountDesc();
 
         return hotBoards.stream().map(Board::toResBoardDto).collect(Collectors.toList());
+    }
 
+    public List<String> boardLikeList(Long boardId) {
+
+        List<BoardLike> boardLikes = boardLikeRepository.findByBoard_BoardId(boardId).orElseThrow(
+                () -> new EntityNotFoundException("이 게시물의 좋아요 명단을 찾을 수 없음.")
+        );
+
+        return boardLikes.stream().map(boardLike -> boardLike.getUser().getEmail()).toList();
     }
 }

@@ -20,6 +20,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/reply")
 @RequiredArgsConstructor
@@ -102,6 +104,15 @@ public class ReplyController {
         replyService.likeCount(replyId, userInfo);
 
         CommonResDto resDto = new CommonResDto(HttpStatus.OK, "좋아요 처리 성공", true);
+        return new ResponseEntity<>(resDto, HttpStatus.OK);
+    }
+
+    // 댓글 좋아요 명단 조회
+    @GetMapping("/like_list")
+    public ResponseEntity<?> replyLikeList(@RequestParam Long replyId){
+        List<String> replyLikes = replyService.replyLikeList(replyId);
+
+        CommonResDto resDto = new CommonResDto(HttpStatus.OK, "댓글 좋아요 명단 조회 완료", replyLikes);
         return new ResponseEntity<>(resDto, HttpStatus.OK);
     }
 }

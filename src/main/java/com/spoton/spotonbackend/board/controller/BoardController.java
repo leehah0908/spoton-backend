@@ -78,6 +78,15 @@ public class BoardController {
         return new ResponseEntity<>(resDto, HttpStatus.OK);
     }
 
+    // 게시물 좋아요 명단 조회
+    @GetMapping("/like_list")
+    public ResponseEntity<?> boardLikeList(@RequestParam Long boardId){
+        List<String> boardLikes = boardService.boardLikeList(boardId);
+
+        CommonResDto resDto = new CommonResDto(HttpStatus.OK, "게시물 좋아요 명단 조회 완료", boardLikes);
+        return new ResponseEntity<>(resDto, HttpStatus.OK);
+    }
+
     // 게시물 신고 (관리자에게 내역 메일 보내기)
     @PostMapping("/report")
     public ResponseEntity<?> sendBoardReport(@RequestBody ReqBoardReportDto dto,

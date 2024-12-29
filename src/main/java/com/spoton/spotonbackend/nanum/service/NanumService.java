@@ -5,6 +5,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.spoton.spotonbackend.board.entity.Board;
 import com.spoton.spotonbackend.board.entity.BoardLike;
 import com.spoton.spotonbackend.board.entity.BoardReport;
+import com.spoton.spotonbackend.board.entity.ReplyLike;
 import com.spoton.spotonbackend.common.auth.EmailProvider;
 import com.spoton.spotonbackend.common.auth.TokenUserInfo;
 import com.spoton.spotonbackend.nanum.dto.request.ReqNanumCreateDto;
@@ -244,5 +245,14 @@ public class NanumService {
             nanumLikeRepository.save(nanumLike);
             nanum.setLikeCount(nanum.getLikeCount() + 1);
         }
+    }
+
+    public List<String> nanumLikeList(Long nanumId) {
+
+        List<NanumLike> nanumLikes = nanumLikeRepository.findByNanum_NanumId(nanumId).orElseThrow(
+                () -> new EntityNotFoundException("이 나눔글의 좋아요 명단을 찾을 수 없음.")
+        );
+
+        return nanumLikes.stream().map(nanumLike -> nanumLike.getUser().getEmail()).toList();
     }
 }

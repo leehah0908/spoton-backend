@@ -123,6 +123,15 @@ public class NanumController {
         return new ResponseEntity<>(resDto, HttpStatus.OK);
     }
 
+    // 나눔글 좋아요 명단 조회
+    @GetMapping("/like_list")
+    public ResponseEntity<?> nanumLikeList(@RequestParam Long nanumId){
+        List<String> nanumLikes = nanumService.nanumLikeList(nanumId);
+
+        CommonResDto resDto = new CommonResDto(HttpStatus.OK, "나눔 찜 명단 조회 완료", nanumLikes);
+        return new ResponseEntity<>(resDto, HttpStatus.OK);
+    }
+
     // 최신 나눔글 조회
     @GetMapping("/lastest_nanum")
     public ResponseEntity<?> lastestNanum(){

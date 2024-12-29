@@ -51,6 +51,7 @@ public class SecurityConfig {
                                     "/board/detail",
                                     "/board/view",
                                     "/board/hot_board",
+                                    "/board/like_list",
                                     "/reply/list",
                                     "/game/list",
                                     "/game/detail",
@@ -58,7 +59,8 @@ public class SecurityConfig {
                                     "/nanum/list",
                                     "/nanum/detail",
                                     "/nanum/lastest_nanum",
-                                    "/nanum/view"
+                                    "/nanum/view",
+                                    "/nanum/like_list"
                             )
                             .permitAll()
                             .anyRequest()

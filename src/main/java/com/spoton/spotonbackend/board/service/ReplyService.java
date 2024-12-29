@@ -176,4 +176,13 @@ public class ReplyService {
             reply.setLikeCount(reply.getLikeCount() + 1);
         }
     }
+
+    public List<String> replyLikeList(Long replyId) {
+
+        List<ReplyLike> replyLikes = replyLikeRepository.findByReply_ReplyId(replyId).orElseThrow(
+                () -> new EntityNotFoundException("이 댓글의 좋아요 명단을 찾을 수 없음.")
+        );
+
+        return replyLikes.stream().map(replyLike -> replyLike.getUser().getEmail()).toList();
+    }
 }
