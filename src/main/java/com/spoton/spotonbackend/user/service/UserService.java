@@ -1,9 +1,15 @@
 package com.spoton.spotonbackend.user.service;
 
 import com.spoton.spotonbackend.common.auth.TokenUserInfo;
+import com.spoton.spotonbackend.nanum.dto.response.ResNanumDto;
+import com.spoton.spotonbackend.nanum.entity.Nanum;
+import com.spoton.spotonbackend.nanum.repository.NanumLikeRepository;
+import com.spoton.spotonbackend.nanum.repository.NanumReportRepository;
+import com.spoton.spotonbackend.nanum.repository.NanumRepository;
 import com.spoton.spotonbackend.user.dto.request.ReqLoginDto;
 import com.spoton.spotonbackend.user.dto.request.ReqModifyDto;
 import com.spoton.spotonbackend.user.dto.request.ReqSignupDto;
+import com.spoton.spotonbackend.user.dto.response.ResProviderDto;
 import com.spoton.spotonbackend.user.dto.response.UserResDto;
 import com.spoton.spotonbackend.user.entity.LoginType;
 import com.spoton.spotonbackend.user.entity.MyTeam;
@@ -29,6 +35,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional
 public class UserService {
+
+    private final NanumRepository nanumRepository;
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -206,5 +214,47 @@ public class UserService {
         return userRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException("회원 정보를 찾을 수 없습니다.")
         );
+    }
+
+    public ResProviderDto findProvider(String email) {
+
+        User user = userRepository.findByEmail(email).orElseThrow(
+                () -> new EntityNotFoundException("나눔 제공자 정보를 찾을 수 없습니다.")
+        );
+
+        List<Nanum> nanumList= nanumRepository.findByUser_UserId(user.getUserId()).orElseThrow(
+                () -> new EntityNotFoundException("나눔글 리스트 조회 불가")
+        );
+
+        List<ResNanumDto> ResNanumList = nanumList.stream().map(Nanum::toResNanumDto).toList();
+
+        Long totalReportCount = 0L;
+        for (Nanum nanum : nanumList) {
+            totalReportCount += nanum.getReportCount();
+        }
+
+        ResProviderDto resProviderDto = user.toResProviderDto();
+        resProviderDto.setCreateTime(user.getCreateTime());
+        resProviderDto.setReportCount(totalReportCount);
+        resProviderDto.setNanumList(ResNanumList);
+
+        return resProviderDto;
+    }
+
+    public void changeNumberCertification(TokenUserInfo userInfo) {
+        User user = userRepository.findByEmail(userInfo.getEmail()).orElseThrow(
+                () -> new EntityNotFoundException("회원 정보를 찾을 수 없습니다.")
+        );
+
+        user.setNumberCertification(true);
+    }
+
+    public boolean getIsNumber(String email) {
+
+        User user = userRepository.findByEmail(email).orElseThrow(
+                () -> new EntityNotFoundException("회원 정보를 찾을 수 없습니다.")
+        );
+
+        return user.isNumberCertification();
     }
 }

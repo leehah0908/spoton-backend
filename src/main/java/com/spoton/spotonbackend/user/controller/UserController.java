@@ -1,10 +1,12 @@
 package com.spoton.spotonbackend.user.controller;
 
 import com.spoton.spotonbackend.common.auth.EmailProvider;
+import com.spoton.spotonbackend.common.auth.SMSProvider;
 import com.spoton.spotonbackend.common.auth.TokenUserInfo;
 import com.spoton.spotonbackend.common.dto.CommonErrorDto;
 import com.spoton.spotonbackend.user.dto.request.ReqModifyDto;
 import com.spoton.spotonbackend.user.dto.request.ReqPasswordChangeDto;
+import com.spoton.spotonbackend.user.dto.response.ResProviderDto;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -40,10 +42,12 @@ public class UserController {
     private final UserService userService;
     private final JwtTokenProvider jwtTokenProvider;
     private final EmailProvider emailProvider;
+    private final SMSProvider smsProvider;
 
     // 레디스 관련 주입
     private final RedisTemplate<String, Object> redisTemplate;
     private final RedisTemplate<String, Integer> emailCertificationTemplate;
+    private final RedisTemplate<String, Integer> numberCertificationTemplate;
 
 
     // 회원가입
@@ -99,16 +103,17 @@ public class UserController {
     public ResponseEntity<?> checkAuthStatus(@AuthenticationPrincipal TokenUserInfo userInfo) {
 
         String profile = userService.getProfile(userInfo.getEmail());
+        boolean isNumber = userService.getIsNumber(userInfo.getEmail());
 
         Map<String,String> map = new HashMap<>();
         map.put("profile", profile);
         map.put("auth", String.valueOf(userInfo.getAuth()));
         map.put("email", userInfo.getEmail());
+        map.put("isNumber", isNumber ? "1" : "0");
 
         CommonResDto resDto = new CommonResDto(HttpStatus.OK, "로그인 완료!", map);
         return new ResponseEntity<>(resDto, HttpStatus.OK);
     }
-
 
     // 이메일 중복 확인
     @GetMapping("/check_email")
@@ -161,6 +166,48 @@ public class UserController {
         return new ResponseEntity<>(resDto, HttpStatus.OK);
     }
 
+    // 번호 인증 문자 보내기
+    @PostMapping("/number_send")
+    public ResponseEntity<?> sendNumber(@RequestParam String number){
+
+        int result = smsProvider.sendCertificationSms(number);
+        if (result == 500) {
+            CommonErrorDto errorDto = new CommonErrorDto(HttpStatus.SERVICE_UNAVAILABLE, "인증 문자 전송 실패");
+            return new ResponseEntity<>(errorDto, HttpStatus.SERVICE_UNAVAILABLE);
+        }
+
+        // 레디스에 인증번호 5분동안 저장
+        numberCertificationTemplate.opsForValue().set(number, result, 5, TimeUnit.MINUTES);
+
+        CommonResDto resDto = new CommonResDto(HttpStatus.OK, "인증 문자 전송 성공", true);
+
+        return new ResponseEntity<>(resDto, HttpStatus.OK);
+    }
+
+    // 번호 인증 확인
+    @GetMapping("/number_certi")
+    public ResponseEntity<?> numberCertification(@RequestParam String number,
+                                                 @RequestParam Integer reqNumber,
+                                                 @AuthenticationPrincipal TokenUserInfo userInfo) {
+
+        Integer tokenNumber = numberCertificationTemplate.opsForValue().get(number);
+
+        if (tokenNumber == null) {
+            return new ResponseEntity<>(
+                    new CommonErrorDto(HttpStatus.REQUEST_TIMEOUT, "인증 번호를 재전송 한 후 다시시도 해주세요."),
+                    HttpStatus.REQUEST_TIMEOUT);
+        }
+
+        if (!tokenNumber.equals(reqNumber)){
+            return new ResponseEntity<>(
+                    new CommonErrorDto(HttpStatus.UNAUTHORIZED, "인증번호가 일치하지 않습니다."),
+                    HttpStatus.UNAUTHORIZED);
+        }
+
+        userService.changeNumberCertification(userInfo);
+        CommonResDto resDto = new CommonResDto(HttpStatus.OK, "인증이 완료되었습니다.", true);
+        return new ResponseEntity<>(resDto, HttpStatus.OK);
+    }
 
     // 닉네임 중복 확인
     @GetMapping("/check_nickname")
@@ -313,7 +360,15 @@ public class UserController {
         userService.withdraw(userInfo);
 
         CommonResDto resDto = new CommonResDto(HttpStatus.OK, "회원탈퇴가 완료되었습니다.", true);
+        return new ResponseEntity<>(resDto, HttpStatus.OK);
+    }
 
+    @GetMapping("/provider")
+    public ResponseEntity<?> provider(@RequestParam String email){
+
+        ResProviderDto providerDto = userService.findProvider(email);
+
+        CommonResDto resDto = new CommonResDto(HttpStatus.OK, "나눔 제공자 조회가 완료되었습니다.", providerDto);
         return new ResponseEntity<>(resDto, HttpStatus.OK);
     }
 }

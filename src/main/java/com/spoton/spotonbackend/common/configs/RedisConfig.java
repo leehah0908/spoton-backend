@@ -41,12 +41,21 @@ public class RedisConfig {
         return new LettuceConnectionFactory(redisStandaloneConfiguration);
     }
 
+    // 문자 인증 (번호 - 인증번호)
+    @Bean
+    @Qualifier("number-certification-db")
+    public RedisConnectionFactory numberCertificationFactory() {
+        RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration(redisHost, redisPort);
+        redisStandaloneConfiguration.setDatabase(2);
+        return new LettuceConnectionFactory(redisStandaloneConfiguration);
+    }
+
     // game detail 데이터 캐싱
     @Bean
     @Qualifier("game-cache-db")
     public RedisConnectionFactory gameCacheFactory() {
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration(redisHost, redisPort);
-        redisStandaloneConfiguration.setDatabase(2);
+        redisStandaloneConfiguration.setDatabase(3);
         return new LettuceConnectionFactory(redisStandaloneConfiguration);
     }
 
@@ -65,6 +74,17 @@ public class RedisConfig {
     @Bean
     @Qualifier("emailCertificationTemplate")
     public RedisTemplate<String, Integer> emailCertificationTemplate(@Qualifier("email-certification-db") RedisConnectionFactory factory) {
+        RedisTemplate<String, Integer> template = new RedisTemplate<>();
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+        template.setConnectionFactory(factory);
+
+        return template;
+    }
+
+    @Bean
+    @Qualifier("numberCertificationTemplate")
+    public RedisTemplate<String, Integer> numberCertificationTemplate(@Qualifier("number-certification-db") RedisConnectionFactory factory) {
         RedisTemplate<String, Integer> template = new RedisTemplate<>();
         template.setKeySerializer(new StringRedisSerializer());
         template.setValueSerializer(new GenericJackson2JsonRedisSerializer());

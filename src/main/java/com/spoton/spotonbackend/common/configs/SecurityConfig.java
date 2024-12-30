@@ -46,6 +46,7 @@ public class SecurityConfig {
                                     "/user/pw_send",
                                     "/user/check_email",
                                     "/user/check_nickname",
+                                    "/user/provider",
                                     "/user/refresh",
                                     "/board/list",
                                     "/board/detail",
