@@ -1,5 +1,7 @@
 package com.spoton.spotonbackend.nanum.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.spoton.spotonbackend.board.dto.response.ResBoardDto;
 import com.spoton.spotonbackend.common.entity.BaseTimeEntity;
 import com.spoton.spotonbackend.nanum.dto.response.ResNanumDto;
@@ -71,9 +73,11 @@ public class Nanum extends BaseTimeEntity {
     private User user;
 
     @OneToMany(mappedBy = "nanum", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<NanumLike> nanumLikes = new ArrayList<>();
 
     @OneToMany(mappedBy = "nanum")
+    @JsonIgnore
     private List<NanumReport> nanumReports = new ArrayList<>();
 
     public ResNanumDto toResNanumDto() {

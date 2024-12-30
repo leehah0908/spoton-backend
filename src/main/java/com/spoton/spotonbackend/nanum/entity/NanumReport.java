@@ -1,5 +1,6 @@
 package com.spoton.spotonbackend.nanum.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.spoton.spotonbackend.board.entity.Board;
 import com.spoton.spotonbackend.user.entity.User;
 import jakarta.persistence.*;
