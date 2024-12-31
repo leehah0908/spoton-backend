@@ -5,7 +5,10 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.spoton.spotonbackend.board.entity.Board;
 import com.spoton.spotonbackend.board.entity.Reply;
 import com.spoton.spotonbackend.common.entity.BaseTimeEntity;
+import com.spoton.spotonbackend.gameChat.entity.GameChat;
 import com.spoton.spotonbackend.nanum.entity.Nanum;
+import com.spoton.spotonbackend.nanumChat.entity.NanumChatMessage;
+import com.spoton.spotonbackend.nanumChat.entity.NanumChatRoom;
 import com.spoton.spotonbackend.user.dto.response.ResProviderDto;
 import com.spoton.spotonbackend.user.dto.response.UserResDto;
 import jakarta.persistence.*;
@@ -71,6 +74,22 @@ public class User extends BaseTimeEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.PERSIST, orphanRemoval = true)
     @JsonIgnore
     private List<Nanum> nanums = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.PERSIST, orphanRemoval = true)
+    @JsonIgnore
+    private List<GameChat> gameChats = new ArrayList<>();
+
+    @OneToMany(mappedBy = "provider", cascade = CascadeType.PERSIST, orphanRemoval = true)
+    @JsonIgnore
+    private List<NanumChatRoom> providedChatRooms = new ArrayList<>();
+
+    @OneToMany(mappedBy = "receiver", cascade = CascadeType.PERSIST, orphanRemoval = true)
+    @JsonIgnore
+    private List<NanumChatRoom> receivedChatRooms = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.PERSIST, orphanRemoval = true)
+    @JsonIgnore
+    private List<NanumChatMessage> nanumChatMessageList = new ArrayList<>();
 
     public void setMyTeam(MyTeam myTeam) {
         // myTeam이 null일 경우, 모든 필드가 null인 빈 MyTeam 객체 생성
