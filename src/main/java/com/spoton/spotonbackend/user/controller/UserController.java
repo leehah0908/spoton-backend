@@ -7,6 +7,7 @@ import com.spoton.spotonbackend.common.dto.CommonErrorDto;
 import com.spoton.spotonbackend.user.dto.request.ReqModifyDto;
 import com.spoton.spotonbackend.user.dto.request.ReqPasswordChangeDto;
 import com.spoton.spotonbackend.user.dto.response.ResProviderDto;
+import com.spoton.spotonbackend.user.entity.LoginType;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -104,12 +105,14 @@ public class UserController {
 
         String profile = userService.getProfile(userInfo.getEmail());
         boolean isNumber = userService.getIsNumber(userInfo.getEmail());
+        LoginType loginType = userService.getLoginType(userInfo.getEmail());
 
         Map<String,String> map = new HashMap<>();
         map.put("profile", profile);
         map.put("auth", String.valueOf(userInfo.getAuth()));
         map.put("email", userInfo.getEmail());
         map.put("isNumber", isNumber ? "1" : "0");
+        map.put("isSNS", loginType.equals(LoginType.COMMON) ? "0" : "1");
 
         CommonResDto resDto = new CommonResDto(HttpStatus.OK, "로그인 완료!", map);
         return new ResponseEntity<>(resDto, HttpStatus.OK);

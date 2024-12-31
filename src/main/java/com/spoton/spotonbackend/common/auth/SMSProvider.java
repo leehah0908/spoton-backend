@@ -35,11 +35,9 @@ public class SMSProvider {
             params.put("type", "sms");
             params.put("text", "[SpotOn] 인증번호는 [" + number + "] 입니다.");
 
-            System.out.println(params.toString());
-
             // 메시지 전송
-            smsMessage.send(params);
-
+//            smsMessage.send(params);
+            System.out.println("보냈다 치고");
             return number;
         } catch (Exception e) {
             e.printStackTrace();

@@ -1,5 +1,6 @@
 package com.spoton.spotonbackend.board.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.spoton.spotonbackend.board.dto.response.ResReplyDto;
 import com.spoton.spotonbackend.common.entity.BaseTimeEntity;
 import com.spoton.spotonbackend.user.entity.User;
@@ -44,10 +45,12 @@ public class Reply extends BaseTimeEntity {
     @JoinColumn(name = "board_id", nullable = false)
     private Board board;
 
-    @OneToMany(mappedBy = "reply", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "reply", cascade = CascadeType.PERSIST, orphanRemoval = true)
+    @JsonIgnore
     private List<ReplyLike> likes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "reply", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "reply", cascade = CascadeType.PERSIST, orphanRemoval = true)
+    @JsonIgnore
     private List<ReplyReport> replyReports = new ArrayList<>();
 
     public ResReplyDto toResReplyDto() {

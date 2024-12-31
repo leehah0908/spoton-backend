@@ -3,8 +3,6 @@ package com.spoton.spotonbackend.user.service;
 import com.spoton.spotonbackend.common.auth.TokenUserInfo;
 import com.spoton.spotonbackend.nanum.dto.response.ResNanumDto;
 import com.spoton.spotonbackend.nanum.entity.Nanum;
-import com.spoton.spotonbackend.nanum.repository.NanumLikeRepository;
-import com.spoton.spotonbackend.nanum.repository.NanumReportRepository;
 import com.spoton.spotonbackend.nanum.repository.NanumRepository;
 import com.spoton.spotonbackend.user.dto.request.ReqLoginDto;
 import com.spoton.spotonbackend.user.dto.request.ReqModifyDto;
@@ -256,5 +254,12 @@ public class UserService {
         );
 
         return user.isNumberCertification();
+    }
+
+    public LoginType getLoginType(String email) {
+        User user = userRepository.findByEmail(email).orElseThrow(
+                () -> new EntityNotFoundException("회원 정보를 찾을 수 없습니다.")
+        );
+        return user.getLoginType();
     }
 }

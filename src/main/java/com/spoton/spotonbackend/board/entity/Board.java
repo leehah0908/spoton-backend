@@ -1,5 +1,6 @@
 package com.spoton.spotonbackend.board.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.spoton.spotonbackend.board.dto.response.ResBoardDto;
 import com.spoton.spotonbackend.common.entity.BaseTimeEntity;
 import com.spoton.spotonbackend.user.entity.User;
@@ -54,13 +55,16 @@ public class Board extends BaseTimeEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "board", cascade = CascadeType.PERSIST, orphanRemoval = true)
+    @JsonIgnore
     private List<Reply> replies = new ArrayList<>();
 
-    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "board", cascade = CascadeType.PERSIST, orphanRemoval = true)
+    @JsonIgnore
     private List<BoardLike> boardLikes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "board", cascade = CascadeType.PERSIST, orphanRemoval = true)
+    @JsonIgnore
     private List<BoardReport> boardReports = new ArrayList<>();
 
     public ResBoardDto toResBoardDto() {

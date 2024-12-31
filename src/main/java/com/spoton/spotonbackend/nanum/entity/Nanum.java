@@ -72,11 +72,11 @@ public class Nanum extends BaseTimeEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @OneToMany(mappedBy = "nanum", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "nanum", cascade = CascadeType.PERSIST, orphanRemoval = true)
     @JsonIgnore
     private List<NanumLike> nanumLikes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "nanum")
+    @OneToMany(mappedBy = "nanum", cascade = CascadeType.PERSIST, orphanRemoval = true)
     @JsonIgnore
     private List<NanumReport> nanumReports = new ArrayList<>();
 
