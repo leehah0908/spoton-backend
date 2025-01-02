@@ -61,7 +61,10 @@ public class SecurityConfig {
                                     "/nanum/detail",
                                     "/nanum/lastest_nanum",
                                     "/nanum/view",
-                                    "/nanum/like_list"
+                                    "/nanum/like_list",
+                                    "/game_chat/**",
+                                    "/read/**",
+                                    "/send/**"
                             )
                             .permitAll()
                             .anyRequest()

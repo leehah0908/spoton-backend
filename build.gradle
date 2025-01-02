@@ -60,6 +60,11 @@ dependencies {
 
     // coolSMS
     implementation group: 'net.nurigo', name: 'javaSDK', version: '2.2'
+
+    // 웹소켓 및 STOMP
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    implementation 'org.webjars:sockjs-client:1.1.2'
+    implementation 'org.webjars:stomp-websocket:2.3.3-1'
 }
 
 tasks.named('test') {
