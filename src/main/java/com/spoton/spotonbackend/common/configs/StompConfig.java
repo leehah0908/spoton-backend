@@ -11,8 +11,8 @@ public class StompConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry
-                // Endpoint를 지정 -> /game_chat
-                .addEndpoint("/game_chat")
+                // Endpoint를 지정 -> /chat
+                .addEndpoint("/chat")
                 // CORS 설정
                 .setAllowedOrigins("*");
     }
