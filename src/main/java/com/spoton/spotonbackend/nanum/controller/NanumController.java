@@ -23,6 +23,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
+import static com.spoton.spotonbackend.nanum.entity.QNanum.nanum;
+
 @RestController
 @RequestMapping("/nanum")
 @RequiredArgsConstructor
@@ -139,5 +141,21 @@ public class NanumController {
 
         CommonResDto resDto = new CommonResDto(HttpStatus.OK, "최신 나눔글 조회 완료", lastestNanumList);
         return new ResponseEntity<>(resDto, HttpStatus.OK);
+    }
+
+    // 상태 변경
+    @PostMapping("/status")
+    public ResponseEntity<?> changeStatus(@RequestParam Long nanumId,
+                                          @AuthenticationPrincipal TokenUserInfo userInfo){
+        // 상태 변경
+        boolean result = nanumService.chaneStatus(nanumId, userInfo);
+
+        if (result) {
+            CommonResDto resDto = new CommonResDto(HttpStatus.OK, "나눔 상태 변경 성공", result);
+            return new ResponseEntity<>(resDto, HttpStatus.OK);
+        }
+
+        CommonErrorDto errorDto = new CommonErrorDto(HttpStatus.UNAUTHORIZED, "나눔 상태 변경 실패");
+        return new ResponseEntity<>(errorDto, HttpStatus.UNAUTHORIZED);
     }
 }

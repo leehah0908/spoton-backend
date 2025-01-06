@@ -4,8 +4,8 @@ import com.spoton.spotonbackend.common.auth.EmailProvider;
 import com.spoton.spotonbackend.common.auth.SMSProvider;
 import com.spoton.spotonbackend.common.auth.TokenUserInfo;
 import com.spoton.spotonbackend.common.dto.CommonErrorDto;
-import com.spoton.spotonbackend.user.dto.request.ReqModifyDto;
-import com.spoton.spotonbackend.user.dto.request.ReqPasswordChangeDto;
+import com.spoton.spotonbackend.user.dto.request.*;
+import com.spoton.spotonbackend.user.dto.response.ResDashboardDto;
 import com.spoton.spotonbackend.user.dto.response.ResProviderDto;
 import com.spoton.spotonbackend.user.entity.LoginType;
 import jakarta.servlet.http.Cookie;
@@ -22,8 +22,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import com.spoton.spotonbackend.common.auth.JwtTokenProvider;
 import com.spoton.spotonbackend.common.dto.CommonResDto;
-import com.spoton.spotonbackend.user.dto.request.ReqLoginDto;
-import com.spoton.spotonbackend.user.dto.request.ReqSignupDto;
 import com.spoton.spotonbackend.user.dto.response.UserResDto;
 import com.spoton.spotonbackend.user.entity.User;
 import com.spoton.spotonbackend.user.service.UserService;
@@ -366,12 +364,23 @@ public class UserController {
         return new ResponseEntity<>(resDto, HttpStatus.OK);
     }
 
+    // 나눔 제공자 정보 조회
     @GetMapping("/provider")
     public ResponseEntity<?> provider(@RequestParam String email){
 
         ResProviderDto providerDto = userService.findProvider(email);
 
         CommonResDto resDto = new CommonResDto(HttpStatus.OK, "나눔 제공자 조회가 완료되었습니다.", providerDto);
+        return new ResponseEntity<>(resDto, HttpStatus.OK);
+    }
+
+    // 나눔 제공자 정보 조회
+    @GetMapping("/dashboard")
+    public ResponseEntity<?> dashboard(@AuthenticationPrincipal TokenUserInfo userInfo){
+
+        ResDashboardDto dashboard = userService.getDashboard(userInfo);
+
+        CommonResDto resDto = new CommonResDto(HttpStatus.OK, "대시보드 조회가 완료되었습니다.", dashboard);
         return new ResponseEntity<>(resDto, HttpStatus.OK);
     }
 }

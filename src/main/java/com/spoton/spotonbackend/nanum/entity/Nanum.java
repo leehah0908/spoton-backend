@@ -32,6 +32,9 @@ public class Nanum extends BaseTimeEntity {
     @JsonIgnore
     private List<String> imagePath;
 
+    @Setter
+    private String thumbnail;
+
     @Column(nullable = false)
     @Setter
     private String subject;

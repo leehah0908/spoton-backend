@@ -1,5 +1,7 @@
 package com.spoton.spotonbackend.user.service;
 
+import com.spoton.spotonbackend.board.entity.Board;
+import com.spoton.spotonbackend.board.repository.BoardRepository;
 import com.spoton.spotonbackend.common.auth.TokenUserInfo;
 import com.spoton.spotonbackend.nanum.dto.response.ResNanumDto;
 import com.spoton.spotonbackend.nanum.entity.Nanum;
@@ -7,6 +9,7 @@ import com.spoton.spotonbackend.nanum.repository.NanumRepository;
 import com.spoton.spotonbackend.user.dto.request.ReqLoginDto;
 import com.spoton.spotonbackend.user.dto.request.ReqModifyDto;
 import com.spoton.spotonbackend.user.dto.request.ReqSignupDto;
+import com.spoton.spotonbackend.user.dto.response.ResDashboardDto;
 import com.spoton.spotonbackend.user.dto.response.ResProviderDto;
 import com.spoton.spotonbackend.user.dto.response.UserResDto;
 import com.spoton.spotonbackend.user.entity.LoginType;
@@ -25,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -35,6 +39,7 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final NanumRepository nanumRepository;
+    private final BoardRepository boardRepository;
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -220,7 +225,7 @@ public class UserService {
                 () -> new EntityNotFoundException("나눔 제공자 정보를 찾을 수 없습니다.")
         );
 
-        List<Nanum> nanumList= nanumRepository.findByUser_UserId(user.getUserId()).orElseThrow(
+        List<Nanum> nanumList= nanumRepository.findByUser_UserIdOrderByCreateTimeDesc(user.getUserId()).orElseThrow(
                 () -> new EntityNotFoundException("나눔글 리스트 조회 불가")
         );
 
@@ -261,5 +266,25 @@ public class UserService {
                 () -> new EntityNotFoundException("회원 정보를 찾을 수 없습니다.")
         );
         return user.getLoginType();
+    }
+
+    public ResDashboardDto getDashboard(TokenUserInfo userInfo) {
+        User user = userRepository.findByEmail(userInfo.getEmail()).orElseThrow(
+                () -> new EntityNotFoundException("회원 정보를 찾을 수 없습니다.")
+        );
+
+        List<Nanum> writeNanums = nanumRepository.findByUser_UserIdOrderByCreateTimeDesc(user.getUserId()).orElse(new ArrayList<>());
+        List<Nanum> likeNanums = nanumRepository.findNanumsLikedByUser(user.getUserId()).orElse(new ArrayList<>());
+
+        List<Board> writeBoards = boardRepository.findByUser_UserIdOrderByCreateTimeDesc(user.getUserId()).orElse(new ArrayList<>());
+        List<Board> likeBoards = boardRepository.findBoardsLikedByUser(user.getUserId()).orElse(new ArrayList<>());
+
+        return ResDashboardDto.builder()
+                .user(user)
+                .writeNanums(writeNanums)
+                .likeNanums(likeNanums)
+                .writeBoards(writeBoards)
+                .likeBoards(likeBoards)
+                .build();
     }
 }

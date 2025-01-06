@@ -26,6 +26,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -109,6 +110,7 @@ public class NanumService {
         }
 
         saveNanum.setImagePath(images);
+        saveNanum.setThumbnail(images.get(0));
         return nanumRepository.save(saveNanum);
     }
 
@@ -254,5 +256,21 @@ public class NanumService {
         );
 
         return nanumLikes.stream().map(nanumLike -> nanumLike.getUser().getEmail()).toList();
+    }
+
+    public boolean chaneStatus(Long nanumId, TokenUserInfo userInfo) {
+        User user = userRepository.findByEmail(userInfo.getEmail()).orElseThrow(
+                () -> new EntityNotFoundException("회원정보를 찾을 수 없습니다.")
+        );
+
+        Nanum nanum = nanumRepository.findById(nanumId).orElseThrow(
+                () -> new EntityNotFoundException("나눔글을 찾을 수 없습니다.")
+        );
+
+        if (user.getUserId().equals(nanum.getUser().getUserId())) {
+            nanum.setStatus("나눔 종료");
+            return true;
+        }
+        return false;
     }
 }

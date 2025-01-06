@@ -82,7 +82,7 @@ public class NanumChatService {
                     .builder()
                     .nanumChatRoomId(room.getNanumChatRoomId())
                     .nanum(room.getNanum())
-                    .nanumImage(room.getNanum().getImagePath().get(0))
+                    .nanumImage(room.getNanum().getThumbnail())
                     .provider(room.getProvider())
                     .receiver(room.getReceiver())
                     .lastMessage(content)
