@@ -29,6 +29,7 @@ public class Nanum extends BaseTimeEntity {
     @Setter
     @ElementCollection
     @CollectionTable(name = "image_path", joinColumns = @JoinColumn(name = "nanumId"))
+    @JsonIgnore
     private List<String> imagePath;
 
     @Column(nullable = false)

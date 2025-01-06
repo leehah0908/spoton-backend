@@ -8,8 +8,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ReqChatCreateMessageDto {
-
+public class ReqHistoryMessageDto {
     private Long roomId;
-    private String message;
 }
