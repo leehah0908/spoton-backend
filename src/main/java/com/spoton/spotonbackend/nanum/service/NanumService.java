@@ -33,6 +33,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -98,7 +99,7 @@ public class NanumService {
         List<String> images = new ArrayList<>();
 
         for (MultipartFile image : imagePaths) {
-            String imagePath = saveNanum.getNanumId() + "_" + image.getOriginalFilename();
+            String imagePath = "nanumId=" + saveNanum.getNanumId() + "_" + image.getOriginalFilename();
             File savePath = new File("/Users/leehah/spoton/spoton-frontend/public/nanum_img/" + imagePath);
             images.add(imagePath);
 
@@ -127,11 +128,17 @@ public class NanumService {
             throw new IllegalArgumentException("수정 권한이 없습니다.");
         }
 
-        List<String> images = new ArrayList<>();
+        removeBeforeImage(String.valueOf(dto.getNanumId()));
 
+        List<String> images = new ArrayList<>();
+        String imagePath;
         for (MultipartFile image : imagePaths) {
-            String imagePath = UUID.randomUUID() + "_" + image.getOriginalFilename();
-            File savePath = new File("/Users/leehah/spoton/spoton-backend/src/main/resources/user_nanum_image/" + imagePath);
+            if (image.getOriginalFilename().startsWith("nanumId=" + dto.getNanumId())) {
+                imagePath = image.getOriginalFilename();
+            } else {
+                imagePath = "nanumId=" + dto.getNanumId() + "_" + image.getOriginalFilename();
+            }
+            File savePath = new File("/Users/leehah/spoton/spoton-frontend/public/nanum_img/" + imagePath);
             images.add(imagePath);
 
             try {
@@ -151,6 +158,31 @@ public class NanumService {
         return nanum;
     }
 
+    // 이미지 삭제 메서드
+    private static void removeBeforeImage(String nanumId) {
+        // 폴더 객체 생성
+        File folder = new File("/Users/leehah/spoton/spoton-frontend/public/nanum_img");
+
+        // 폴더가 존재하지 않으면 리턴
+        if (!folder.exists() || !folder.isDirectory()) {
+            throw new RuntimeException("이미지 삭제 실패");
+        }
+
+        // 폴더 안의 파일 목록 가져오기
+        File[] files = folder.listFiles((dir, name) -> name.startsWith("nanumId=" + nanumId));
+
+        // 파일 삭제
+        if (files != null) {
+            for (File file : files) {
+                if (file.delete()) {
+                    System.out.println("삭제 성공: " + file.getName());
+                } else {
+                    System.out.println("삭제 실패: " + file.getName());
+                }
+            }
+        }
+    }
+
     public void delete(Long nanumdId, TokenUserInfo userInfo) {
         Nanum nanum = nanumRepository.findById(nanumdId).orElseThrow(
                 () -> new EntityNotFoundException("나눔글을 찾을 수 없습니다.")
@@ -163,6 +195,8 @@ public class NanumService {
         if (!nanum.getUser().getUserId().equals(user.getUserId())) {
             throw new IllegalArgumentException("삭제 권한이 없습니다.");
         }
+
+        removeBeforeImage(String.valueOf(nanum.getNanumId()));
 
         nanumRepository.delete(nanum);
     }
