@@ -46,7 +46,6 @@ public class UserService {
 
     // 회원가입
     public User signup(@Valid ReqSignupDto dto) {
-
         if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
             User user = userRepository.findByEmail(dto.getEmail()).orElseThrow(
                     () -> new EntityNotFoundException("회원 정보를 찾을 수 없습니다.")
@@ -66,7 +65,6 @@ public class UserService {
 
     // 로그인
     public User login(@Valid ReqLoginDto dto) {
-
         User loginUser = userRepository.findByEmail(dto.getEmail()).orElseThrow(() ->
                 new EntityNotFoundException("회원 정보 찾을 수 없습니다."));
 
@@ -94,7 +92,6 @@ public class UserService {
 
     // 닉네임 중복 체크
     public boolean checkNickname(String nickname) {
-
         if (userRepository.findByNickname(nickname).isPresent()) {
             throw new IllegalArgumentException("이미 존재하는 닉네임입니다.");
         }
@@ -103,7 +100,6 @@ public class UserService {
 
     // 비밀번호 일치 확인
     public User checkPassword(String email, String password) {
-
         User loginUser = userRepository.findByEmail(email).orElseThrow(() ->
                 new EntityNotFoundException("회원 정보 찾을 수 없음"));
 
@@ -116,7 +112,6 @@ public class UserService {
 
     // 마이페이지용 회원 개인 정보 조회
     public UserResDto myInfo(TokenUserInfo userInfo) {
-
         User user = userRepository.findByEmail(userInfo.getEmail()).orElseThrow(
                 () -> new EntityNotFoundException("회원 정보를 찾을 수 없습니다.")
         );
@@ -126,7 +121,6 @@ public class UserService {
 
     // 회원관리용 회원 정보 리스트 조회
     public List<UserResDto> userInfo(Pageable pageable) {
-
         Page<User> userList = userRepository.findAll(pageable);
 
         return userList.stream()
@@ -136,7 +130,6 @@ public class UserService {
 
     // 회원 정보 수정
     public User modify(TokenUserInfo userInfo, ReqModifyDto dto) {
-
         User user = userRepository.findByEmail(userInfo.getEmail()).orElseThrow(
                 () -> new EntityNotFoundException("회원 정보를 찾을 수 없습니다.")
         );
@@ -220,7 +213,6 @@ public class UserService {
     }
 
     public ResProviderDto findProvider(String email) {
-
         User user = userRepository.findByEmail(email).orElseThrow(
                 () -> new EntityNotFoundException("나눔 제공자 정보를 찾을 수 없습니다.")
         );
@@ -253,7 +245,6 @@ public class UserService {
     }
 
     public boolean getIsNumber(String email) {
-
         User user = userRepository.findByEmail(email).orElseThrow(
                 () -> new EntityNotFoundException("회원 정보를 찾을 수 없습니다.")
         );

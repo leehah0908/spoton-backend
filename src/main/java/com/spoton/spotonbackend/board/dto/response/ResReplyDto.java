@@ -21,5 +21,4 @@ public class ResReplyDto {
     private LocalDateTime updateTime;
     private String nickname;
     private String profile;
-
 }

@@ -1,13 +1,10 @@
 package com.spoton.spotonbackend.common.auth;
 
 import net.nurigo.java_sdk.api.Message;
-import net.nurigo.java_sdk.exceptions.CoolsmsException;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
-import java.util.Random;
 
 @Component
 public class SMSProvider {

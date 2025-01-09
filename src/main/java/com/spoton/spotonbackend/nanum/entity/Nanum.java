@@ -1,8 +1,6 @@
 package com.spoton.spotonbackend.nanum.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.spoton.spotonbackend.board.dto.response.ResBoardDto;
 import com.spoton.spotonbackend.common.entity.BaseTimeEntity;
 import com.spoton.spotonbackend.nanum.dto.response.ResNanumDto;
 import com.spoton.spotonbackend.nanumChat.entity.NanumChatRoom;

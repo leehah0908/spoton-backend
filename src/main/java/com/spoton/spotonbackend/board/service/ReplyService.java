@@ -14,7 +14,6 @@ import com.spoton.spotonbackend.common.auth.EmailProvider;
 import com.spoton.spotonbackend.common.auth.TokenUserInfo;
 import com.spoton.spotonbackend.user.entity.User;
 import com.spoton.spotonbackend.user.repository.UserRepository;
-import com.spoton.spotonbackend.user.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static com.spoton.spotonbackend.board.entity.QBoard.board;
 import static com.spoton.spotonbackend.board.entity.QReply.reply;
 
 @Service
@@ -43,7 +41,6 @@ public class ReplyService {
     private final EmailProvider emailProvider;
 
     public Page<ResReplyDto> list(Long boardId, Pageable pageable) {
-
         List<Reply> rawReplies = queryFactory
                 .selectFrom(reply)
                 .where(reply.board.boardId.eq(boardId))
@@ -62,7 +59,6 @@ public class ReplyService {
     }
 
     public Reply create(ReqReplyCreateDto dto, TokenUserInfo userInfo) {
-
         Board board = boardRepository.findById(dto.getBoardId()).orElseThrow(
                 () -> new EntityNotFoundException("게시물을 찾을 수 없습니다.")
         );
@@ -121,7 +117,6 @@ public class ReplyService {
     }
 
     public String sendReport(ReqReplyReportDto dto, TokenUserInfo userInfo) {
-
         Reply reply = replyRepository.findById(dto.getReplyId()).orElseThrow(
                 () -> new EntityNotFoundException("댓글을 찾을 수 없습니다.")
         );
@@ -151,7 +146,6 @@ public class ReplyService {
     }
 
     public void likeCount(Long replyId, TokenUserInfo userInfo) {
-
         User user = userRepository.findByEmail(userInfo.getEmail()).orElseThrow(
                 () -> new EntityNotFoundException("회원 정보를 찾을 수 없습니다.")
         );
@@ -178,7 +172,6 @@ public class ReplyService {
     }
 
     public List<String> replyLikeList(Long replyId) {
-
         List<ReplyLike> replyLikes = replyLikeRepository.findByReply_ReplyId(replyId).orElseThrow(
                 () -> new EntityNotFoundException("이 댓글의 좋아요 명단을 찾을 수 없음.")
         );

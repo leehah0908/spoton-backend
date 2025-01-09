@@ -1,6 +1,5 @@
 package com.spoton.spotonbackend.board.repository;
 
-import com.spoton.spotonbackend.board.entity.BoardLike;
 import com.spoton.spotonbackend.board.entity.ReplyLike;
 import org.springframework.data.jpa.repository.JpaRepository;
 

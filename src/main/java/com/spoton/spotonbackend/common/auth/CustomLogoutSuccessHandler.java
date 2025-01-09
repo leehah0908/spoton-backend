@@ -34,7 +34,7 @@ public class CustomLogoutSuccessHandler implements LogoutSuccessHandler {
                                 HttpServletResponse response,
                                 Authentication authentication) throws IOException, ServletException {
 
-        String redirectUri = "http://localhost:3000";
+        String redirectUri = "http://onspoton.com";
         LoginType loginType = null;
 
         Cookie[] cookies = request.getCookies();

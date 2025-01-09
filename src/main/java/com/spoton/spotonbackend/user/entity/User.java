@@ -1,7 +1,6 @@
 package com.spoton.spotonbackend.user.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.spoton.spotonbackend.board.entity.Board;
 import com.spoton.spotonbackend.board.entity.Reply;
 import com.spoton.spotonbackend.common.entity.BaseTimeEntity;

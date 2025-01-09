@@ -1,7 +1,5 @@
 package com.spoton.spotonbackend.nanum.controller;
 
-import com.spoton.spotonbackend.board.dto.request.ReqBoardReportDto;
-import com.spoton.spotonbackend.board.entity.Board;
 import com.spoton.spotonbackend.common.auth.TokenUserInfo;
 import com.spoton.spotonbackend.common.dto.CommonErrorDto;
 import com.spoton.spotonbackend.common.dto.CommonResDto;
@@ -22,8 +20,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-
-import static com.spoton.spotonbackend.nanum.entity.QNanum.nanum;
 
 @RestController
 @RequestMapping("/nanum")

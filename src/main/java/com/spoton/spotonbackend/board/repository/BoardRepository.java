@@ -1,7 +1,6 @@
 package com.spoton.spotonbackend.board.repository;
 
 import com.spoton.spotonbackend.board.entity.Board;
-import com.spoton.spotonbackend.nanum.entity.Nanum;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

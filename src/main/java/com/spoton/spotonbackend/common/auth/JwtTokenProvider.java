@@ -29,7 +29,6 @@ public class JwtTokenProvider {
 
     // 액세스 토큰 생성
     public String createAccessToken(String email, String auth) {
-
         Claims claims = Jwts.claims().setSubject(email);
 
         claims.put("auth", auth);
@@ -45,7 +44,6 @@ public class JwtTokenProvider {
 
     // 리프레시 토큰 생성
     public String createRefreshToken(String email, String auth) {
-
         Claims claims = Jwts.claims().setSubject(email);
 
         claims.put("auth", auth);

@@ -26,5 +26,4 @@ public class BoardReport {
     @ManyToOne
     @JoinColumn(name = "board_id", nullable = false)
     private Board board;
-
 }

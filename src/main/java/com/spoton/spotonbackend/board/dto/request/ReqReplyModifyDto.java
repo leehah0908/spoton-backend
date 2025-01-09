@@ -12,5 +12,4 @@ public class ReqReplyModifyDto {
 
     private String content;
     private Long replyId;
-
 }

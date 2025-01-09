@@ -52,7 +52,6 @@ public class UserController {
     // 회원가입
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@Valid @RequestBody ReqSignupDto dto){
-
         User user = userService.signup(dto);
 
         CommonResDto resDto = new CommonResDto(HttpStatus.CREATED, "회원가입 완료", user.getUserId());
@@ -64,7 +63,6 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody ReqLoginDto dto,
                                    HttpServletResponse response){
-
         // 회원 정보 일치 여부 확인
         User user = userService.login(dto);
 
@@ -100,7 +98,6 @@ public class UserController {
     // 로그인 후 회원 정보 응답
     @GetMapping("/login/check")
     public ResponseEntity<?> checkAuthStatus(@AuthenticationPrincipal TokenUserInfo userInfo) {
-
         String profile = userService.getProfile(userInfo.getEmail());
         boolean isNumber = userService.getIsNumber(userInfo.getEmail());
         LoginType loginType = userService.getLoginType(userInfo.getEmail());
@@ -119,7 +116,6 @@ public class UserController {
     // 이메일 중복 확인
     @GetMapping("/check_email")
     public ResponseEntity<?> checkEmail(@RequestParam String email){
-
         boolean checkEmail = userService.checkEmail(email);
 
         CommonResDto resDto = new CommonResDto(HttpStatus.OK, "사용가능한 이메일입니다.", checkEmail);
@@ -129,7 +125,6 @@ public class UserController {
     // 이메일 인증 메일 보내기
     @PostMapping("/email_send")
     public ResponseEntity<?> sendEmail(@RequestParam String email){
-
         int number = emailProvider.sendCertificationMail(email);
         if (number == 500) {
             CommonErrorDto errorDto = new CommonErrorDto(HttpStatus.SERVICE_UNAVAILABLE, "인증 이메일 전송 실패");
@@ -148,7 +143,6 @@ public class UserController {
     @GetMapping("/email_certi")
     public ResponseEntity<?> emailCertification(@RequestParam String email,
                                                 @RequestParam Integer reqNumber) {
-
         Integer tokenNumber = emailCertificationTemplate.opsForValue().get(email);
 
         if (tokenNumber == null) {
@@ -170,7 +164,6 @@ public class UserController {
     // 번호 인증 문자 보내기
     @PostMapping("/number_send")
     public ResponseEntity<?> sendNumber(@RequestParam String number){
-
         int result = smsProvider.sendCertificationSms(number);
         if (result == 500) {
             CommonErrorDto errorDto = new CommonErrorDto(HttpStatus.SERVICE_UNAVAILABLE, "인증 문자 전송 실패");
@@ -190,7 +183,6 @@ public class UserController {
     public ResponseEntity<?> numberCertification(@RequestParam String number,
                                                  @RequestParam Integer reqNumber,
                                                  @AuthenticationPrincipal TokenUserInfo userInfo) {
-
         Integer tokenNumber = numberCertificationTemplate.opsForValue().get(number);
 
         if (tokenNumber == null) {
@@ -213,7 +205,6 @@ public class UserController {
     // 닉네임 중복 확인
     @GetMapping("/check_nickname")
     public ResponseEntity<?> checkNickname(@RequestParam String nickname){
-
         boolean checkNickname = userService.checkNickname(nickname);
 
         CommonResDto resDto = new CommonResDto(HttpStatus.OK, "사용가능한 닉네임입니다.", checkNickname);
@@ -225,7 +216,6 @@ public class UserController {
     @PostMapping("/check_pw")
     public ResponseEntity<?> checkPw(@RequestBody String password,
                                      @AuthenticationPrincipal TokenUserInfo userInfo){
-
         User user = userService.checkPassword(userInfo.getEmail(), password);
 
         CommonResDto resDto = new CommonResDto(HttpStatus.OK, "비밀번호가 일치합니다.", user.getUserId());
@@ -235,7 +225,6 @@ public class UserController {
     // 비밀번호 재발급
     @PostMapping("/pw_send")
     public ResponseEntity<?> sendPassword(@RequestParam String email){
-
         String newPw = emailProvider.sendTemporaryPassword(email);
 
         if (newPw.equals("fail")) {
@@ -254,7 +243,6 @@ public class UserController {
     @PostMapping("/change_pw")
     public ResponseEntity<?> changePassword(@RequestBody ReqPasswordChangeDto dto,
                                             @AuthenticationPrincipal TokenUserInfo userInfo) {
-
         User user = userService.checkPassword(userInfo.getEmail(), dto.getOldPassword());
 
         User newUser = userService.setNewPassword(user.getEmail(), dto.getNewPassword());
@@ -269,7 +257,6 @@ public class UserController {
     @GetMapping("/user_info")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> userInfo(Pageable pageable) {
-
         List<UserResDto> ResDto = userService.userInfo(pageable);
 
         CommonResDto resDto = new CommonResDto(HttpStatus.OK, "회원정보 조회 성공", ResDto);
@@ -280,7 +267,6 @@ public class UserController {
     // 회원 정보 조회 (회원)
     @GetMapping("/my_info")
     public ResponseEntity<?> myInfo(@AuthenticationPrincipal TokenUserInfo userInfo) {
-
         UserResDto dto = userService.myInfo(userInfo);
 
         CommonResDto resDto = new CommonResDto(HttpStatus.OK, "myinfo 조회 성공", dto);
@@ -293,7 +279,6 @@ public class UserController {
     @PatchMapping("/modify")
     public ResponseEntity<?> modify(@RequestBody ReqModifyDto dto,
                                     @AuthenticationPrincipal TokenUserInfo userInfo) {
-
         User user = userService.modify(userInfo, dto);
 
         CommonResDto resDto = new CommonResDto(HttpStatus.OK, "회원 정보 수정 성공", user.getUserId());
@@ -306,7 +291,6 @@ public class UserController {
     @PostMapping("/set_profile")
     public ResponseEntity<?> setProfile(@RequestBody MultipartFile imgFile,
                                         @AuthenticationPrincipal TokenUserInfo userInfo) {
-
         User user = userService.profileSet(userInfo, imgFile);
 
         CommonResDto resDto = new CommonResDto(HttpStatus.OK, "프로필 사진 저장 완료", user.getUserId());
@@ -319,7 +303,6 @@ public class UserController {
     @PostMapping("/refresh")
     public ResponseEntity<?> refreshToken(@CookieValue("userId") String userId,
                                           HttpServletResponse response) {
-
         User user = userService.findById(Long.valueOf(userId));
 
         Object refreshToken = redisTemplate.opsForValue().get(user.getEmail());
@@ -357,7 +340,6 @@ public class UserController {
     // 회원 탈퇴
     @PostMapping("/withdraw")
     public ResponseEntity<?> withdraw(@AuthenticationPrincipal TokenUserInfo userInfo){
-
         userService.withdraw(userInfo);
 
         CommonResDto resDto = new CommonResDto(HttpStatus.OK, "회원탈퇴가 완료되었습니다.", true);
@@ -367,7 +349,6 @@ public class UserController {
     // 나눔 제공자 정보 조회
     @GetMapping("/provider")
     public ResponseEntity<?> provider(@RequestParam String email){
-
         ResProviderDto providerDto = userService.findProvider(email);
 
         CommonResDto resDto = new CommonResDto(HttpStatus.OK, "나눔 제공자 조회가 완료되었습니다.", providerDto);
@@ -377,7 +358,6 @@ public class UserController {
     // 나눔 제공자 정보 조회
     @GetMapping("/dashboard")
     public ResponseEntity<?> dashboard(@AuthenticationPrincipal TokenUserInfo userInfo){
-
         ResDashboardDto dashboard = userService.getDashboard(userInfo);
 
         CommonResDto resDto = new CommonResDto(HttpStatus.OK, "대시보드 조회가 완료되었습니다.", dashboard);

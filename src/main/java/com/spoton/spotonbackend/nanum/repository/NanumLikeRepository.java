@@ -1,6 +1,5 @@
 package com.spoton.spotonbackend.nanum.repository;
 
-import com.spoton.spotonbackend.board.entity.ReplyLike;
 import com.spoton.spotonbackend.nanum.entity.NanumLike;
 import org.springframework.data.jpa.repository.JpaRepository;
 

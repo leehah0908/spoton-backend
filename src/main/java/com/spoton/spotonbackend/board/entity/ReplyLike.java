@@ -26,5 +26,4 @@ public class ReplyLike {
     @ManyToOne
     @JoinColumn(name = "reply_id", nullable = false)
     private Reply reply;
-
 }

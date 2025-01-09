@@ -43,7 +43,6 @@ public class BoardService {
     private final EmailProvider emailProvider;
 
     public Board create(ReqBoardCreateDto dto, TokenUserInfo userInfo) {
-
         User user = userRepository.findByEmail(userInfo.getEmail()).orElseThrow(
                 () -> new EntityNotFoundException("작성자 정보를 찾을 수 없습니다.")
         );
@@ -57,7 +56,6 @@ public class BoardService {
     public Page<ResBoardDto> list(String searchType,
                                   String searchKeyword,
                                   Pageable pageable) {
-
         BooleanBuilder builder = new BooleanBuilder();
 
         // 쿼리 조각 만들기
@@ -91,7 +89,6 @@ public class BoardService {
     }
 
     public ResBoardDto boardDetail(Long boardId) {
-
         Board board = boardRepository.findById(boardId).orElseThrow(
                 () -> new EntityNotFoundException("게시물 정보를 찾을 수 없습니다.")
         );
@@ -100,7 +97,6 @@ public class BoardService {
     }
 
     public Board modify(ReqBoardModifyDto dto, TokenUserInfo userInfo) {
-
         Board board = boardRepository.findById(dto.getBoardId()).orElseThrow(
                 () -> new EntityNotFoundException("게시물을 찾을 수 없습니다.")
         );
@@ -121,7 +117,6 @@ public class BoardService {
     }
 
     public void delete(Long boardId, TokenUserInfo userInfo) {
-
         Board board = boardRepository.findById(boardId).orElseThrow(
                 () -> new EntityNotFoundException("게시물을 찾을 수 없습니다.")
         );
@@ -138,7 +133,6 @@ public class BoardService {
     }
 
     public String sendReport(ReqBoardReportDto dto, TokenUserInfo userInfo) {
-
         Board board = boardRepository.findById(dto.getBoardId()).orElseThrow(
                 () -> new EntityNotFoundException("게시물을 찾을 수 없습니다.")
         );
@@ -168,7 +162,6 @@ public class BoardService {
     }
 
     public Board increaseViewCount(Long boardId) {
-
         Board board = boardRepository.findById(boardId).orElseThrow(
                 () -> new EntityNotFoundException("게시물을 찾을 수 없습니다.")
         );
@@ -208,14 +201,12 @@ public class BoardService {
     }
 
     public List<ResBoardDto> hotBoard() {
-
         List<Board> hotBoards = boardRepository.findTop10ByOrderByLikeCountDesc();
 
         return hotBoards.stream().map(Board::toResBoardDto).collect(Collectors.toList());
     }
 
     public List<String> boardLikeList(Long boardId) {
-
         List<BoardLike> boardLikes = boardLikeRepository.findByBoard_BoardId(boardId).orElseThrow(
                 () -> new EntityNotFoundException("이 게시물의 좋아요 명단을 찾을 수 없음.")
         );

@@ -1,8 +1,6 @@
 package com.spoton.spotonbackend.nanumChat.entity;
 
 import com.spoton.spotonbackend.common.entity.BaseTimeEntity;
-import com.spoton.spotonbackend.gameChat.entity.GameChat;
-import com.spoton.spotonbackend.nanum.entity.Nanum;
 import com.spoton.spotonbackend.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;

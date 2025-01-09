@@ -5,9 +5,7 @@ import com.spoton.spotonbackend.board.dto.request.ReqReplyModifyDto;
 import com.spoton.spotonbackend.board.dto.request.ReqReplyReportDto;
 import com.spoton.spotonbackend.board.dto.response.ResReplyDto;
 import com.spoton.spotonbackend.board.entity.Reply;
-import com.spoton.spotonbackend.board.entity.ReplyLike;
 import com.spoton.spotonbackend.board.service.ReplyService;
-import com.spoton.spotonbackend.common.auth.EmailProvider;
 import com.spoton.spotonbackend.common.auth.TokenUserInfo;
 import com.spoton.spotonbackend.common.dto.CommonErrorDto;
 import com.spoton.spotonbackend.common.dto.CommonResDto;
@@ -29,12 +27,10 @@ import java.util.List;
 public class ReplyController {
 
     private final ReplyService replyService;
-    private final EmailProvider emailProvider;
 
     // 댓글 조회
     @GetMapping("/list")
     public ResponseEntity<?> replyList(@RequestParam Long boardId, Pageable pageable){
-
         Page<ResReplyDto> replies = replyService.list(boardId, pageable);
 
         CommonResDto resDto = new CommonResDto(HttpStatus.OK, "댓글 조회 완료", replies);
@@ -45,7 +41,6 @@ public class ReplyController {
     @PostMapping("/create")
     public ResponseEntity<?> replyCreate(@RequestBody ReqReplyCreateDto dto,
                                          @AuthenticationPrincipal TokenUserInfo userInfo){
-
         Reply reply = replyService.create(dto, userInfo);
 
         CommonResDto resDto = new CommonResDto(HttpStatus.CREATED, "댓글 등록 완료", reply.getReplyId());
@@ -56,7 +51,6 @@ public class ReplyController {
     @PatchMapping("/modify")
     public ResponseEntity<?> replyModify(@RequestParam ReqReplyModifyDto dto,
                                          @AuthenticationPrincipal TokenUserInfo userInfo) {
-
         Reply reply = replyService.modify(dto, userInfo);
 
         CommonResDto resDto = new CommonResDto(HttpStatus.OK, "댓글 수정 완료", reply.getReplyId());
@@ -68,7 +62,6 @@ public class ReplyController {
     public ResponseEntity<?> replyDelete(@RequestParam Long replyId,
                                          @RequestParam Long boardId,
                                          @AuthenticationPrincipal TokenUserInfo userInfo) {
-
         replyService.delete(replyId, boardId, userInfo);
 
         CommonResDto resDto = new CommonResDto(HttpStatus.OK, "댓글 삭제 완료", true);
@@ -99,7 +92,6 @@ public class ReplyController {
     @PostMapping("/like")
     public ResponseEntity<?> addLikeCount(@RequestParam Long replyId,
                                           @AuthenticationPrincipal TokenUserInfo userInfo) {
-
         // 좋아요 처리
         replyService.likeCount(replyId, userInfo);
 

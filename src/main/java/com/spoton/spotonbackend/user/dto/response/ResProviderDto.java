@@ -1,10 +1,6 @@
 package com.spoton.spotonbackend.user.dto.response;
 
 import com.spoton.spotonbackend.nanum.dto.response.ResNanumDto;
-import com.spoton.spotonbackend.nanum.entity.Nanum;
-import com.spoton.spotonbackend.user.entity.Auth;
-import com.spoton.spotonbackend.user.entity.LoginType;
-import com.spoton.spotonbackend.user.entity.MyTeam;
 import lombok.*;
 
 import java.time.LocalDateTime;

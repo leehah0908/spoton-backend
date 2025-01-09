@@ -3,9 +3,6 @@ package com.spoton.spotonbackend.nanum.dto.request;
 import com.spoton.spotonbackend.nanum.entity.Nanum;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 @Setter
 @Getter

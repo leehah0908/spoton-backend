@@ -2,14 +2,12 @@ package com.spoton.spotonbackend.game.repository;
 
 import com.spoton.spotonbackend.game.dto.request.ReqGameListDto;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Repository
 public class GameRepository {

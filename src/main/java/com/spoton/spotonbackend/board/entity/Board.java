@@ -83,5 +83,4 @@ public class Board extends BaseTimeEntity {
                 .profile(user.getProfile())
                 .build();
     }
-
 }

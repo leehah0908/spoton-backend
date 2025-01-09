@@ -13,7 +13,6 @@ import com.spoton.spotonbackend.nanumChat.dto.response.ResNanumChatMessageDto;
 import com.spoton.spotonbackend.nanumChat.dto.response.ResNanumChatRoomDto;
 import com.spoton.spotonbackend.nanumChat.entity.NanumChatMessage;
 import com.spoton.spotonbackend.nanumChat.entity.NanumChatRoom;
-import com.spoton.spotonbackend.nanumChat.entity.QNanumChatMessage;
 import com.spoton.spotonbackend.nanumChat.repository.NanumChatMessageRepository;
 import com.spoton.spotonbackend.nanumChat.repository.NanumChatRoomRepository;
 import com.spoton.spotonbackend.user.entity.User;
@@ -94,7 +93,6 @@ public class NanumChatService {
     }
 
     public List<ResNanumChatMessageDto> getNanumChatMessage(ReqHistoryMessageDto dto) {
-
         List<NanumChatMessage> nanumChatMessages = nanumChatMessageRepository
                 .findByNanumChatRoomId_NanumChatRoomId(dto.getRoomId())
                 .orElse(new ArrayList<>());

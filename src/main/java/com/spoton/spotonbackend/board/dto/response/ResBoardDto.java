@@ -1,6 +1,5 @@
 package com.spoton.spotonbackend.board.dto.response;
 
-import com.spoton.spotonbackend.user.entity.User;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -26,5 +25,4 @@ public class ResBoardDto {
     private LocalDateTime updateTime;
     private String nickname;
     private String profile;
-
 }
