@@ -1,5 +1,6 @@
 package com.spoton.spotonbackend.nanum.service;
 
+import com.amazonaws.services.s3.model.PutObjectResult;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.spoton.spotonbackend.board.entity.Board;
@@ -52,6 +53,7 @@ public class NanumService {
 
     private final JPAQueryFactory queryFactory;
     private final EmailProvider emailProvider;
+    private final S3Handler s3Handler;
 
     public Page<ResNanumDto> list(String searchType, String searchKeyword, Pageable pageable) {
         BooleanBuilder builder = new BooleanBuilder();
@@ -99,18 +101,13 @@ public class NanumService {
         List<String> images = new ArrayList<>();
 
         for (MultipartFile image : imagePaths) {
-            String imagePath = "nanumId=" + saveNanum.getNanumId() + "_" + image.getOriginalFilename();
-            File savePath = new File("/Users/leehah/spoton/spoton-frontend/public/nanum_img/" + imagePath);
-            images.add(imagePath);
-
-            try {
-                image.transferTo(savePath);
-            } catch (IOException e) {
-                throw new RuntimeException("이미지 저장 실패");
-            }
+            String imageName = "nanumId=" + saveNanum.getNanumId() + "_" + image.getOriginalFilename();
+            s3Handler.upload(image, imageName);
+            images.add(imageName);
         }
 
         saveNanum.setImagePath(images);
+        System.out.println("images: " + images);
         saveNanum.setThumbnail(images.get(0));
         return nanumRepository.save(saveNanum);
     }
@@ -128,24 +125,18 @@ public class NanumService {
             throw new IllegalArgumentException("수정 권한이 없습니다.");
         }
 
-        removeBeforeImage(String.valueOf(dto.getNanumId()));
+        s3Handler.delete(String.valueOf(dto.getNanumId()));
 
         List<String> images = new ArrayList<>();
-        String imagePath;
+        String imageName;
         for (MultipartFile image : imagePaths) {
             if (image.getOriginalFilename().startsWith("nanumId=" + dto.getNanumId())) {
-                imagePath = image.getOriginalFilename();
+                imageName = image.getOriginalFilename();
             } else {
-                imagePath = "nanumId=" + dto.getNanumId() + "_" + image.getOriginalFilename();
+                imageName = "nanumId=" + dto.getNanumId() + "_" + image.getOriginalFilename();
             }
-            File savePath = new File("/Users/leehah/spoton/spoton-frontend/public/nanum_img/" + imagePath);
-            images.add(imagePath);
-
-            try {
-                image.transferTo(savePath);
-            } catch (IOException e) {
-                throw new RuntimeException("이미지 저장 실패");
-            }
+            s3Handler.upload(image, imageName);
+            images.add(imageName);
         }
 
         nanum.setImagePath(images);
@@ -158,33 +149,8 @@ public class NanumService {
         return nanum;
     }
 
-    // 이미지 삭제 메서드
-    private static void removeBeforeImage(String nanumId) {
-        // 폴더 객체 생성
-        File folder = new File("/Users/leehah/spoton/spoton-frontend/public/nanum_img");
-
-        // 폴더가 존재하지 않으면 리턴
-        if (!folder.exists() || !folder.isDirectory()) {
-            throw new RuntimeException("이미지 삭제 실패");
-        }
-
-        // 폴더 안의 파일 목록 가져오기
-        File[] files = folder.listFiles((dir, name) -> name.startsWith("nanumId=" + nanumId));
-
-        // 파일 삭제
-        if (files != null) {
-            for (File file : files) {
-                if (file.delete()) {
-                    System.out.println("삭제 성공: " + file.getName());
-                } else {
-                    System.out.println("삭제 실패: " + file.getName());
-                }
-            }
-        }
-    }
-
-    public void delete(Long nanumdId, TokenUserInfo userInfo) {
-        Nanum nanum = nanumRepository.findById(nanumdId).orElseThrow(
+    public void delete(Long nanumId, TokenUserInfo userInfo) {
+        Nanum nanum = nanumRepository.findById(nanumId).orElseThrow(
                 () -> new EntityNotFoundException("나눔글을 찾을 수 없습니다.")
         );
 
@@ -196,14 +162,14 @@ public class NanumService {
             throw new IllegalArgumentException("삭제 권한이 없습니다.");
         }
 
-        removeBeforeImage(String.valueOf(nanum.getNanumId()));
+        s3Handler.delete(String.valueOf(nanumId));
 
         nanumRepository.delete(nanum);
     }
 
-    public ResNanumDto nanumDetail(Long nanumdId) {
+    public ResNanumDto nanumDetail(Long nanumId) {
 
-        Nanum nanum = nanumRepository.findById(nanumdId).orElseThrow(
+        Nanum nanum = nanumRepository.findById(nanumId).orElseThrow(
                 () -> new EntityNotFoundException("게시물 정보를 찾을 수 없습니다.")
         );
 

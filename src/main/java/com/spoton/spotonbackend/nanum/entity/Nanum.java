@@ -93,6 +93,7 @@ public class Nanum extends BaseTimeEntity {
         return ResNanumDto.builder()
                 .nanumId(nanumId)
                 .imagePath(imagePath)
+                .thumbnail(thumbnail)
                 .subject(subject)
                 .content(content)
                 .sports(sports)
