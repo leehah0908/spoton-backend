@@ -58,4 +58,5 @@ jobs:
             docker rmi spoton-server || true
             docker pull ${{ steps.login-ecr.outputs.registry }}/spoton-server:latest
             docker image tag ${{ steps.login-ecr.outputs.registry }}/spoton-server:latest spoton-server:latest
+            docker rmi ${{ steps.login-ecr.outputs.registry }}/spoton-server:latest
             docker-compose up -d
