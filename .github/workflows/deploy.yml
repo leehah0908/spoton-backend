@@ -39,7 +39,7 @@ jobs:
       - name: Docker Image create
         run: docker build -t spoton-server .
 
-      - name: Docker image add Tag
+      - name: Docker image add tag
         run: docker tag spoton-server ${{ steps.login-ecr.outputs.registry }}/spoton-server:latest
 
       - name: Docker Image Push to ECR
