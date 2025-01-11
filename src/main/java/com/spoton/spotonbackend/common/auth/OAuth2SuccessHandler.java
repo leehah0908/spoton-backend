@@ -63,6 +63,6 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         response.addCookie(userIdCookie);
 
         response.addCookie(cookie);
-        response.sendRedirect("http://onspoton.com");
+        response.sendRedirect("https://onspoton.com");
     }
 }
