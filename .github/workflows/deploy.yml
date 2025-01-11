@@ -54,6 +54,6 @@ jobs:
           script_stop: true
           script: |
             docker-compose down -v || true
-            docker rm spoton-server || true
+            docker rmi spoton-server || true
             docker pull ${{ steps.login-ecr.outputs.registry }}/spoton-server:latest
             docker-compose up -d
