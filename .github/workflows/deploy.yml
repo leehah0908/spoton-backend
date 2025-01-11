@@ -53,6 +53,7 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script_stop: true
           script: |
+            cd spoton/ || exit 1
             docker-compose down -v || true
             docker rmi spoton-server || true
             docker pull ${{ steps.login-ecr.outputs.registry }}/spoton-server:latest
