@@ -56,5 +56,5 @@ jobs:
             cd spoton/ || exit 1
             docker-compose down -v || true
             docker rmi spoton-server || true
-            docker pull 724772076633.dkr.ecr.ap-northeast-2.amazonaws.com/spoton-server:latest
+            docker pull ${{ steps.login-ecr.outputs.registry }}/spoton-server:latest
             docker-compose up -d
