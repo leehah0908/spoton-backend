@@ -66,6 +66,7 @@ public class GameController {
 
     @GetMapping("/today")
     public ResponseEntity<?> todayGame(){
+        log.info("오늘 경기 들어왔따용~");
         List<Map<String, Object>> todayGameList = gameService.today();
 
         CommonResDto resDto = new CommonResDto(HttpStatus.OK, "오늘 경기 조회 완료", todayGameList);
