@@ -53,8 +53,28 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script_stop: true
           script: |
-            cd spoton/ || exit 1
-            docker-compose down -v || true
-            docker rmi spoton-server || true
-            docker pull ${{ steps.login-ecr.outputs.registry }}/spoton-server:latest
-            docker-compose up -d
+            echo "Changing directory to 'spoton/'..."
+            
+            cd spoton/ || { echo "Error: Failed to change directory to 'spoton/'. Exiting..."; exit 1; }
+            
+            echo "Stopping and removing containers..."
+            if ! docker-compose down -v; then
+              echo "Warning: Failed to stop containers or remove volumes. Continuing..."
+            fi
+            
+            echo "Removing old image 'spoton-server'..."
+            if ! docker rmi spoton-server; then
+              echo "Warning: Image 'spoton-server' does not exist or failed to delete. Continuing..."
+            fi
+            
+            echo "Pulling the latest image from ECR..."
+            if ! docker pull ${{ steps.login-ecr.outputs.registry }}/spoton-server:latest; then
+              echo "Error: Failed to pull the latest image from ECR. Exiting..."
+            exit 1
+            fi
+            
+            echo "Starting containers with Docker Compose..."
+            if ! docker-compose up -d; then
+              echo "Error: Failed to start containers. Exiting..."
+            exit 1
+            fi
