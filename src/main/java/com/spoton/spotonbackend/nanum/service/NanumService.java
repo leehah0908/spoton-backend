@@ -135,6 +135,7 @@ public class NanumService {
         nanum.setSports(dto.getSports());
         nanum.setQuantity(dto.getQuantity());
         nanum.setGiveMethod(dto.getGiveMethod());
+        nanum.setThumbnail(images.get(0));
 
         return nanum;
     }
