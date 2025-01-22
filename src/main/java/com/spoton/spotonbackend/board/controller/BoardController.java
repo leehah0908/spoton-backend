@@ -127,6 +127,7 @@ public class BoardController {
         return new ResponseEntity<>(resDto, HttpStatus.OK);
     }
 
+    // 인기글 조회
     @GetMapping("/hot_board")
     public ResponseEntity<?> hotBoard(){
         List<ResBoardDto> hotBoardList = boardService.hotBoard();
