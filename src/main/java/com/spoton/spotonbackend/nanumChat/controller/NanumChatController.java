@@ -57,15 +57,12 @@ public class NanumChatController {
         return new ResponseEntity<>(resDto, HttpStatus.OK);
     }
 
-    // 전역 메시지 발행
-    @MessageMapping("/chat/nanum_chat/global")
-    public void nanumChatGlobal(ReqSendMessageDto dto) {
+    // 메시지 발행
+    @MessageMapping("/chat/nanum_chat")
+    public void sendNanumChatMessage(@RequestBody ReqSendMessageDto dto) {
         ResNanumChatMessageDto chatDto = nanumChatService.saveMessage(dto);
 
-        // 전역 구독 메시지 전송
-        // for 채팅 리스트 최신화
-        messagingTemplate.convertAndSend("/sub/chat/nanum_chat/global" , chatDto);
-        // for 채팅방 메세지 최신화
         messagingTemplate.convertAndSend("/sub/chat/nanum_chat/" + dto.getRoomId() , chatDto);
     }
+
 }

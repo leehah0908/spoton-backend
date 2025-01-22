@@ -26,7 +26,7 @@ public class GameChatController {
     // prefix를 /pub 설정 -> 클라이언트가 /pub/chat/game_chat/{gameId}로 메시지 전송
     @MessageMapping("/chat/game_chat/{gameId}")
     public void sendGameChatMessage(@DestinationVariable String gameId,
-                                                 @RequestBody ReqGameChatDto dto) {
+                                    @RequestBody ReqGameChatDto dto) {
         ResGameChatDto chatDto = gameChatService.saveMessage(gameId, dto);
 
         // 메시지 전송 (같은 게임 정보를 보고 있는 유저한테)

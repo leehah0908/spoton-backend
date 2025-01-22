@@ -355,7 +355,7 @@ public class UserController {
         return new ResponseEntity<>(resDto, HttpStatus.OK);
     }
 
-    // 나눔 제공자 정보 조회
+    // 대시보드
     @GetMapping("/dashboard")
     public ResponseEntity<?> dashboard(@AuthenticationPrincipal TokenUserInfo userInfo){
         ResDashboardDto dashboard = userService.getDashboard(userInfo);

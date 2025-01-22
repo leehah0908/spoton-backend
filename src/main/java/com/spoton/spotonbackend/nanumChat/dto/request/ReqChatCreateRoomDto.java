@@ -11,6 +11,6 @@ import lombok.*;
 public class ReqChatCreateRoomDto {
 
     private String providerEmail;
-    private String  receiverEmail;
+    private String receiverEmail;
     private Long nanumId;
 }
