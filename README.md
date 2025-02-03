@@ -52,7 +52,7 @@ SpotOn은 단순한 경기 일정 확인 서비스를 넘어, **팬들이 함께
 - ![React](https://img.shields.io/badge/React-61DAFB?style=flat-square&logo=react&logoColor=black) - 사용자 인터페이스  
 
 ### 🥉 DevOps  
-- ![AWS](https://img.shields.io/badge/AWS-232F3E?style=flat-square&logo=amazonaws&logoColor=white) - 클라우드 환경  
+- ![AWS](https://img.shields.io/badge/AWS-232F3E?style=flat-square&logo=amazonaws&logoColor=white) - 클라우드 환경 (EC2, ECR, S3, RDS, Route53, CloudFront, IAM, ACM)
 - ![Nginx](https://img.shields.io/badge/Nginx-009639?style=flat-square&logo=nginx&logoColor=white) , ![Certbot](https://img.shields.io/badge/Certbot-3A6057?style=flat-square&logo=letsencrypt&logoColor=white) - 리버스 프록시 및 SSL 인증  
 - ![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white) - 컨테이너화  
 - ![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-2088FF?style=flat-square&logo=githubactions&logoColor=white) - CI/CD 자동화  
