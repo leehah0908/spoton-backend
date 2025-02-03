@@ -64,7 +64,14 @@
 
 아래 이미지는 SpotOn의 전체 아키텍처를 나타냅니다.  
 
-<img width="612" alt="Image" src="https://github.com/user-attachments/assets/749dc1c5-c2a5-4a8b-bb80-437f6b859e09" />
+<img width="1000" alt="Image" src="https://github.com/user-attachments/assets/749dc1c5-c2a5-4a8b-bb80-437f6b859e09" />
+
+---
+
+## 🗄️ ERD 
+<img width="1000" alt="Image" src="https://github.com/user-attachments/assets/9760295b-3224-41f5-a9af-688ca45a489c" />
+
+🔗 [ERD 보기](https://www.erdcloud.com/d/9kNb3ACqSjytwmne3)  
 
 ---
 
@@ -72,13 +79,6 @@
 
 API 명세는 **Postman**에서 확인할 수 있습니다.  
 🔗 [API 문서 보기](https://documenter.getpostman.com/view/38853291/2sAYQWLtf7)  
-
----
-
-## 🗄️ ERD (Entity-Relationship Diagram)  
-
-데이터베이스 모델링을 위한 ERD 다이어그램입니다.  
-🔗 [ERD 보기](https://www.erdcloud.com/d/9kNb3ACqSjytwmne3)  
 
 ---
 
