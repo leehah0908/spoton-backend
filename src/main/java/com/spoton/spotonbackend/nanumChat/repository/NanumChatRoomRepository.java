@@ -9,6 +9,4 @@ import java.util.Optional;
 
 public interface NanumChatRoomRepository extends JpaRepository<NanumChatRoom, Long> {
     List<NanumChatRoom> findByReceiverAndNanum_NanumId(User receiver, Long nanumId);
-
-    Optional<List<NanumChatRoom>> findByProviderOrReceiver(User provider, User receiver);
 }

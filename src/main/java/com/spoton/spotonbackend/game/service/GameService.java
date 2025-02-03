@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.LinkedHashMap;
@@ -30,9 +31,12 @@ public class GameService {
     public List<Map<String, Object>> list(ReqGameListDto dto) {
         int year = dto.getYear();
         int month = dto.getMonth();
-        String yearMonth = String.format("%d-%02d", year, month);
 
-        return gameRepository.findGamesByDate(dto, yearMonth);
+        YearMonth yearMonth = YearMonth.of(year, month);
+        String startDate = yearMonth.atDay(1).toString();
+        String endDate = yearMonth.atEndOfMonth().toString();
+
+        return gameRepository.findGamesByDate(dto, startDate, endDate);
     }
 
     public Map<String, String> myTeamLoad(TokenUserInfo userInfo) {
@@ -62,9 +66,7 @@ public class GameService {
     }
 
     public List<Map<String, Object>> today() {
-        String today = LocalDate.now(ZoneId.of("Asia/Seoul"))
-                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-
+        LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
         return gameRepository.todayGame(today);
     }
 }
