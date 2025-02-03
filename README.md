@@ -2,10 +2,6 @@
 
 **스포츠 경기 일정 및 커뮤니티 플랫폼**  
 
-[![Website](https://img.shields.io/badge/website-online-brightgreen)](https://onspoton.com/)  
-[![Postman API](https://img.shields.io/badge/API%20Docs-Postman-orange)](https://documenter.getpostman.com/view/38853291/2sAYQWLtf7)  
-[![ERD Diagram](https://img.shields.io/badge/ERD-Diagram-blue)](https://www.erdcloud.com/d/9kNb3ACqSjytwmne3)  
-
 ---
 
 ## 🏗️ 프로젝트 개요  
@@ -13,6 +9,15 @@
 **SpotOn**은 스포츠 팬들을 위한 플랫폼으로, 경기 일정 확인부터 실시간 응원 채팅, 커뮤니티 활동까지 한 곳에서 즐길 수 있는 서비스입니다.  
 
 🔗 **서비스 URL**: [https://onspoton.com/](https://onspoton.com/)  
+
+---
+
+## 📂 관련 레포지토리  
+
+SpotOn 프로젝트는 **백엔드, 프론트엔드, Airflow가 별도 레포지토리**로 관리됩니다.  
+
+🔗 **Frontend Repository**: [SpotOn Frontend](https://github.com/leehah0908/spoton-frontend)  
+🔗 **Airflow Repository**: [SpotOn Airflow](https://github.com/leehah0908/spoton-airflow)  
 
 ---
 
@@ -46,13 +51,13 @@ SpotOn은 단순한 경기 일정 확인 서비스를 넘어, **팬들이 함께
 - ![JPA](https://img.shields.io/badge/JPA-6DB33F?style=flat-square) , ![QueryDSL](https://img.shields.io/badge/QueryDSL-005571?style=flat-square) , ![JDBC](https://img.shields.io/badge/JDBC-003B57?style=flat-square) - 데이터베이스 접근  
 - ![Redis](https://img.shields.io/badge/Redis-DC382D?style=flat-square&logo=redis&logoColor=white) - 캐싱 및 세션 관리  
 - ![JWT](https://img.shields.io/badge/JWT-000000?style=flat-square&logo=jsonwebtokens&logoColor=white) - 인증 및 보안  
-- ![STOMP](https://img.shields.io/badge/STOMP-FF4500?style=flat-square) - 실시간 채팅
+- ![STOMP](https://img.shields.io/badge/STOMP-FF4500?style=flat-square&logo=rocket&logoColor=white) - 실시간 채팅
 
 ### 🥈 Frontend  
-- ![React](https://img.shields.io/badge/React-61DAFB?style=flat-square&logo=react&logoColor=black) - 사용자 인터페이스  
+- ![React](https://img.shields.io/badge/React-21232A?style=flat-square&logo=react&logoColor=#61DAFB) - 사용자 인터페이스  
 
 ### 🥉 DevOps  
-- ![AWS](https://img.shields.io/badge/AWS-232F3E?style=flat-square&logo=amazonaws&logoColor=white) - 클라우드 환경 (EC2, ECR, S3, RDS, Route53, CloudFront, IAM, ACM)
+- ![AWS](https://img.shields.io/badge/AWS-232F3E?style=flat-square&logo=amazonwebservices&logoColor=white) - 클라우드 환경  (EC2, ECR, S3, RDS, Route53, CloudFront, IAM, ACM)
 - ![Nginx](https://img.shields.io/badge/Nginx-009639?style=flat-square&logo=nginx&logoColor=white) , ![Certbot](https://img.shields.io/badge/Certbot-3A6057?style=flat-square&logo=letsencrypt&logoColor=white) - 리버스 프록시 및 SSL 인증  
 - ![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white) - 컨테이너화  
 - ![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-2088FF?style=flat-square&logo=githubactions&logoColor=white) - CI/CD 자동화  
