@@ -64,7 +64,7 @@
 
 아래 이미지는 SpotOn의 전체 아키텍처를 나타냅니다.  
 
-![Architecture](![Image](https://github.com/user-attachments/assets/8c71ba0a-7376-451e-a1a1-37dc674e6c7a))  
+<img width="612" alt="Image" src="https://github.com/user-attachments/assets/749dc1c5-c2a5-4a8b-bb80-437f6b859e09" />
 
 ---
 
